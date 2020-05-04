@@ -1,0 +1,61 @@
+package com.ch33tz.filters;
+
+import java.io.IOException;
+import java.util.logging.Logger;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
+
+import com.ch33tz.logger.JspLogger;
+
+/**
+ * Servlet Filter implementation class RequestFilter
+ */
+@WebFilter("/RequestFilter")
+public class RequestFilter implements Filter {
+	
+	private final static Logger logger = Logger.getLogger(JspLogger.class.getName()); 
+	private FilterConfig requestFilterConfig;
+
+    /**
+     * Default constructor. 
+     */
+    public RequestFilter() {
+        logger.info("Creating RequestFilter");
+    }
+
+	/**
+	 * @see Filter#destroy()
+	 */
+	public void destroy() {
+		logger.info("Destroying RequestFilter");
+		this.requestFilterConfig = null;
+	}
+
+	/**
+	 * @see Filter#doFilter(ServletRequest, ServletResponse, FilterChain)
+	 */
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+		
+		String username = request.getParameter("uu");
+		String password = request.getParameter("pp");
+		
+		if (username === null) logger.info("nulo");
+		
+		chain.doFilter(request, response);
+	}
+
+	/**
+	 * @see Filter#init(FilterConfig)
+	 */
+	public void init(FilterConfig fConfig) throws ServletException {
+		logger.info("RequestFilter initialization");
+		this.requestFilterConfig = fConfig;
+	}
+
+}

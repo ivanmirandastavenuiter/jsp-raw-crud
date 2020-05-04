@@ -1,0 +1,83 @@
+package com.ch33tz.filters;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
+import javax.servlet.http.HttpServletRequest;
+
+import com.ch33tz.logger.JspLogger;
+
+/**
+ * Servlet Filter implementation class RequestFilter
+ */
+@WebFilter("/LoginFilter")
+public class LoginFilter implements Filter {
+	
+	private final static Logger logger = Logger.getLogger(JspLogger.class.getName()); 
+	private FilterConfig loginFilterConfig;
+
+    /**
+     * Default constructor. 
+     */
+    public LoginFilter() {
+        logger.info("Creating LoginFilter");
+    }
+
+	/**
+	 * @see Filter#destroy()
+	 */
+	public void destroy() {
+		logger.info("Destroying LoginFilter");
+		this.loginFilterConfig = null;
+	}
+
+	/**
+	 * @see Filter#doFilter(ServletRequest, ServletResponse, FilterChain)
+	 */
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+		
+		logger.info("Executing doFilter on LoginFilter");
+		
+		HttpServletRequest httpServletRequest = (HttpServletRequest)request;
+		
+		String username = httpServletRequest.getParameter("uu");
+		String password = httpServletRequest.getParameter("pp");
+		String contextPath = httpServletRequest.getContextPath();
+		String absoluteRedirectPath = "http://localhost:8080" + contextPath;
+		
+		if (username.isEmpty() || username == null
+					|| password.isEmpty() || password == null) {
+			
+			logger.info("Errors detected on login form. Redirecting to index.");
+			
+			Map<String, String> errors = new HashMap<String, String>();
+			
+			httpServletRequest.setAttribute("errors", errors);
+
+            RequestDispatcher rd = httpServletRequest.getRequestDispatcher(absoluteRedirectPath);
+            rd.include(httpServletRequest, response);
+
+		}
+		
+		chain.doFilter(request, response);
+	}
+
+	/**
+	 * @see Filter#init(FilterConfig)
+	 */
+	public void init(FilterConfig fConfig) throws ServletException {
+		logger.info("LoginFilter initialization");
+		this.loginFilterConfig = fConfig;
+	}
+
+}

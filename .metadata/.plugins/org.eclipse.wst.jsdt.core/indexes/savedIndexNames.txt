@@ -1,0 +1,6 @@
+INDEX VERSION 1.4+C:\Users\IMS\Desktop\HACKING\WEB-DEVELOPMENT\JAVA\PROJECTS\CH33TZ-JSP\.metadata\.plugins\org.eclipse.wst.jsdt.core\indexes
+560985740.index
+3933255058.index
+160177099.index
+1866690869.index
+2821582595.index

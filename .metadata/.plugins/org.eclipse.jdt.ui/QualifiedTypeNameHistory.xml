@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="java.io.IOException"/>
+    <fullyQualifiedTypeName name="org.apache.catalina.core.ApplicationContextFacade"/>
+    <fullyQualifiedTypeName name="javax.servlet.ServletContext"/>
+    <fullyQualifiedTypeName name="javax.servlet.DispatcherType"/>
+    <fullyQualifiedTypeName name="javax.servlet.FilterRegistration"/>
+    <fullyQualifiedTypeName name="javax.annotation.security.DeclareRoles"/>
+    <fullyQualifiedTypeName name="java.util.logging.Logger"/>
+</qualifiedTypeNameHistroy>
