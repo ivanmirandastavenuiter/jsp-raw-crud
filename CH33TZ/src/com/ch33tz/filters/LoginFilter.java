@@ -47,38 +47,40 @@ public class LoginFilter implements Filter {
 	 */
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		
-		logger.info("Executing doFilter on LoginFilter");
+		logger.info("Starting validation on filter.");
 		
 		HttpServletRequest httpServletRequest = (HttpServletRequest)request;
 		HttpServletResponse httpServletResponse = (HttpServletResponse)response;
 		
-		String username = httpServletRequest.getParameter("username");
-		String password = httpServletRequest.getParameter("pass");
+		String username = httpServletRequest.getParameter("username").trim();
+		String password = httpServletRequest.getParameter("pass").trim();
 		String contextPath = "/";
 		
-		if (username.isEmpty() || username == null
-					|| password.isEmpty() || password == null) {
+		if (username == null || username.isEmpty()
+					|| password == null || password.isEmpty()) {
 			
-			logger.info("Errors detected on login form. Redirecting to index.");
+			logger.info("Errors detected on login form. Redirecting to index from filter.");
 			
 			Map<String, String> errors = new HashMap<String, String>();
 			
-			if (username.isEmpty() || username == null) {
+			if (username == null || username.isEmpty()) {
 				errors.put("username", "Error on username. Empty.");
 			} 
 			
-			if (password.isEmpty() || password == null) {
+			if (password == null || password.isEmpty() ) {
 				errors.put("password", "Error on password. Empty.");
 			}
 			
 			httpServletRequest.setAttribute("errors", errors);
-
             RequestDispatcher rd = httpServletRequest.getRequestDispatcher(contextPath);
             rd.forward(httpServletRequest, httpServletResponse);
+            return;
 
 		}
 		
+		logger.info("Validation passed on filtering. Forwarding to target page.");
 		chain.doFilter(request, response);
+		
 	}
 
 	/**

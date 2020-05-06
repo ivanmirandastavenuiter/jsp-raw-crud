@@ -32,6 +32,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		
 		try {
 			
+			validation = true;
 			inputsMap.forEach(validateInputs);
 
 			if (!validation) {

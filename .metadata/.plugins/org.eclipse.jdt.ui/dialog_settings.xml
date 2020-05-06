@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
-	<item key="org.eclipse.jdt.ui.lastextjar" value="C:\Users\IMS\Downloads"/>
+	<item key="org.eclipse.jdt.ui.lastextjar" value="C:\Users\IMS\Desktop\HACKING\WEB-DEVELOPMENT\JAVA\PROJECTS\CH33TZ-JSP\CH33TZ\WebContent\WEB-INF\lib"/>
 	<section name="JavaElementSearchActions">
 	</section>
 	<section name="BuildPathsPropertyPage">
 		<item key="pageIndex" value="2"/>
 	</section>
 	<section name="ClasspathContainerSelectionPage">
-		<item key="index" value="7"/>
+		<item key="index" value="9"/>
 	</section>
 	<section name="completion_proposal_size">
 	</section>
