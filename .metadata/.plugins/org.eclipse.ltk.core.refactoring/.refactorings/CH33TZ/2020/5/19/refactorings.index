@@ -13,3 +13,5 @@
 1588594853074	Move 'JSP' to 'WebContent'
 1588691463047	Rename compilation unit 'dd.java'
 1588692777845	Delete element
+1588868025313	Move 'welcome.jsp' to 'WebContent'
+1588938783133	Move 'welcome.jsp' to 'JSP'

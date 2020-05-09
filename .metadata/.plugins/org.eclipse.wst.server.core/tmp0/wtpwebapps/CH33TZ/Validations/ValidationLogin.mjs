@@ -11,6 +11,8 @@ import { ValidationFormException } from '../Exceptions/ValidationFormException.m
 
 document.addEventListener("DOMContentLoaded", function() {
 	
+	var availableCookies = document.cookie;
+	
 	var loginForm = document.getElementsByName("loginForm")[0];
 	var submit = false;
 	var validation = true;
@@ -24,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	var inputsMap = new Map();
 	inputsMap.set(username, wrongUsernameNode)
 			 .set(pass, wrongPassNode);
-
+	
 	// Main function on submit
 	loginForm.onsubmit = function(e) {
 		
@@ -96,18 +98,38 @@ document.addEventListener("DOMContentLoaded", function() {
 				
 				let resetNode = (value) => {
 					value.innerText = '';	
-					value.style.transition = 'none';
-					value.style.opacity = 0;
+					value.parentElement.style.transition = 'none';
+					value.parentElement.style.opacity = 0;
 				}
 				
 				if (submit) {
-					if (key.value.trim().length > 0) {
-						resetNode(value);
-					} else {
-						throw new ValidationFormException(ValidationException.WARNING, 
-														  ValidationException.USERNAME_EMPTY_FIELD,
-														  value);
+					
+					let descriptionType = value.className.substring(0,4);
+					
+					if (descriptionType === 'user') {
+						
+						if (key.value.trim().length > 0) {
+							resetNode(value);
+						} else {
+							throw new ValidationFormException(ValidationException.WARNING, 
+															  ValidationException.USERNAME_EMPTY_FIELD,
+															  value);
+						}
+						
 					}
+					
+					if (descriptionType === 'pass') {
+						
+						if (key.value.trim().length > 0) {
+							resetNode(value);
+						} else {
+							throw new ValidationFormException(ValidationException.WARNING, 
+															  ValidationException.PASSWORD_EMPTY_FIELD,
+															  value);
+						}
+						
+					}
+					
 				}
 				
 			} catch(validationFormException) {
@@ -125,6 +147,102 @@ document.addEventListener("DOMContentLoaded", function() {
 	}
 	
 	inputsMap.forEach(validateInputsAfterSubmit);
+	
+	var controlErrorsFromServer = () => {
+		
+		try { 
+			
+			let errorsArray = [];
+			let usernameWrongMessageNode = document.querySelector("p.username-wrong-validation");
+			let passwordWrongMessageNode = document.querySelector("p.password-wrong-validation");
+			
+			if (availableCookies != undefined && availableCookies != '') {
+				
+				submit = true;
+				
+				errorsArray = availableCookies.split(";");
+				
+				var errorsList = (value, key, map) => {
+					
+					try {
+						
+						if (value.trim() === "username=username") {
+							
+							throw new ValidationFormException(ValidationException.WARNING, 
+									  ValidationException.USERNAME_EMPTY_FIELD,
+									  usernameWrongMessageNode);
+							
+						}
+						
+						if (value.trim() === "password=password") {
+							
+							throw new ValidationFormException(ValidationException.WARNING, 
+									  ValidationException.PASSWORD_EMPTY_FIELD,
+									  passwordWrongMessageNode);
+							
+						}
+						
+					} catch(validationFormException){
+						
+						if (validationFormException instanceof ValidationFormException) {
+							validationFormException.handleLoginErrorAfterSubmit();
+						} else {
+							throw validationFormException;
+						}
+						
+					}
+					
+				}
+				
+				errorsArray.forEach(errorsList);
+				
+			}
+			
+		} catch(err) {
+			
+			console.log('Exception thrown by parent try/catch block: ');
+			console.log('Name: ' + err.name);
+			console.log('Description: ' + err.message);
+			console.log('Stack: ' + err.stack);
+				
+		} 
+		
+	}
+	
+	controlErrorsFromServer();
+	
+	var getCookie = (cookieName) => {
+		
+		if (availableCookies != undefined && availableCookies != '') {
+			
+			let cookieNameStartingIndex = availableCookies.indexOf(cookieName);
+			let cookieValueStartingIndex = cookieNameStartingIndex + cookieName.length + 1;
+			let charIndex = cookieValueStartingIndex;
+			let endIndex = availableCookies.length;
+			let cookieValue = '';
+			
+			if (cookieNameStartingIndex != -1) {
+				
+				while(availableCookies.charAt(charIndex) != ";" && charIndex != endIndex) {
+					console.log(availableCookies.charAt(charIndex))
+					cookieValue += availableCookies.charAt(charIndex);
+					charIndex++;
+				}
+				
+				return cookieValue.trim();
+			
+			} else {
+				
+				return 'Cookie not found';
+				
+			}
+			
+		}
+		
+	}
+	
+	let cookieValue = getCookie('password');
+	console.log(cookieValue);
 	
 });
 

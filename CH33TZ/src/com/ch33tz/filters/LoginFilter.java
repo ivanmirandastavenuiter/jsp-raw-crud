@@ -21,7 +21,7 @@ import com.ch33tz.logger.JspLogger;
 /**
  * Servlet Filter implementation class RequestFilter
  */
-@WebFilter(filterName = "LoginFilter", urlPatterns = {"/welcome.jsp"})
+@WebFilter(filterName = "LoginFilter", urlPatterns = {"/index.jsp"})
 public class LoginFilter implements Filter {
 	
 	private final static Logger logger = Logger.getLogger(JspLogger.class.getName()); 
@@ -52,34 +52,47 @@ public class LoginFilter implements Filter {
 		HttpServletRequest httpServletRequest = (HttpServletRequest)request;
 		HttpServletResponse httpServletResponse = (HttpServletResponse)response;
 		
-		String username = httpServletRequest.getParameter("username").trim();
-		String password = httpServletRequest.getParameter("pass").trim();
-		String contextPath = "/";
-		
-		if (username == null || username.isEmpty()
-					|| password == null || password.isEmpty()) {
-			
-			logger.info("Errors detected on login form. Redirecting to index from filter.");
-			
-			Map<String, String> errors = new HashMap<String, String>();
-			
-			if (username == null || username.isEmpty()) {
-				errors.put("username", "Error on username. Empty.");
-			} 
-			
-			if (password == null || password.isEmpty() ) {
-				errors.put("password", "Error on password. Empty.");
-			}
-			
-			httpServletRequest.setAttribute("errors", errors);
-            RequestDispatcher rd = httpServletRequest.getRequestDispatcher(contextPath);
-            rd.forward(httpServletRequest, httpServletResponse);
-            return;
-
+		if (httpServletRequest.getMethod().equals("GET")) {
+			logger.info("GET request detected on index page. Bypassing filters.");
+			chain.doFilter(httpServletRequest, httpServletResponse);
 		}
 		
-		logger.info("Validation passed on filtering. Forwarding to target page.");
-		chain.doFilter(request, response);
+		if (httpServletRequest.getMethod().equals("POST")) {
+			
+			logger.info("POST request detected on index page. Applying filters against input data.");
+			
+			String username = httpServletRequest.getParameter("username");
+			String password = httpServletRequest.getParameter("pass");
+			String contextPath = "/";
+			
+			username = username != null ? username.trim() : null;
+			password = password != null ? password.trim() : null;
+			
+			if (username == null || username.isEmpty()
+						|| password == null || password.isEmpty()) {
+				
+				logger.info("Errors detected on login form. Redirecting to index from filter.");
+				
+				Map<String, String> errors = new HashMap<String, String>();
+				
+				if (username == null || username.isEmpty()) {
+					errors.put("username", "Error on username. Empty.");
+				} 
+				
+				if (password == null || password.isEmpty() ) {
+					errors.put("password", "Error on password. Empty.");
+				}
+				
+				httpServletRequest.setAttribute("errors", errors);
+	            RequestDispatcher rd = httpServletRequest.getRequestDispatcher(contextPath);
+	            rd.forward(httpServletRequest, httpServletResponse);
+
+			}
+			
+			logger.info("Validation passed on filtering. Forwarding to target page.");
+			chain.doFilter(request, response);
+			
+		}
 		
 	}
 

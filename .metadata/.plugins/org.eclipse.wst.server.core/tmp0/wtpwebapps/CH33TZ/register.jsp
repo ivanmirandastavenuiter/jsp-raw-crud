@@ -118,6 +118,10 @@
 		display: block;
 		margin-top: 10px;
 	}
+	
+	.inputs-group-div .login-back-link-div span a {
+		color: #464c80;
+	}
 
 	/* Buttons, boxes and links interactions */
 

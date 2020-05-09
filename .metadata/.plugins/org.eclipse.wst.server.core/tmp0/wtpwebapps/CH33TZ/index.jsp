@@ -1,6 +1,15 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"
-    import = "java.util.Map, java.util.HashMap, java.util.Collection, java.util.Set" %>
+    pageEncoding="UTF-8" %>
+<%@ page import="java.sql.Statement" %>
+<%@ page import="java.sql.ResultSet" %>
+<%@ page import="java.sql.DriverManager" %>
+<%@ page import="java.sql.Connection" %>
+<%@ page import="java.sql.PreparedStatement" %>
+<%@ page import="java.util.logging.Logger" %>
+<%@ page import="java.util.Map, java.util.HashMap" %>
+<%@ page import="java.util.Collection" %>
+<%@ page import="java.util.Set" %>
+<%@ page import="java.util.Set" %>
 <%@ taglib uri = "http://java.sun.com/jsp/jstl/core" prefix = "c" %>
 <!DOCTYPE html>
 <html>
@@ -127,10 +136,13 @@
 	}
 
 	.inputs-group-div .register-link-div span {
-		color: #464c80;
 		font-size: 0.75em;
 		display: block;
 		margin-top: 10px;
+	}
+	
+	.inputs-group-div .register-link-div span a {
+	  	color: #464c80 !important;
 	}
 
 	/* Buttons, boxes and links interactions */
@@ -171,36 +183,146 @@
 <body>
 
 	<c:set var = "contextPath" value="${pageContext.request.contextPath}" />
-	<c:set var = "actionPath" value="${contextPath}/JSP/welcome.jsp" />
 	
-	<% 
-	
-		Map errors = (HashMap)request.getAttribute("errors");
-	
-		if (errors != null) {
+	<%
+
+		if (request.getMethod().equals("POST")) {
 			
-			%>
-			
-			<c:set var = "usernameError" value="${errors.username}" />
-			<c:set var = "passwordError" value="${errors.password}" />
+			Logger logger = Logger.getLogger(com.ch33tz.logger.JspLogger.class.getName()); 
+			logger.info("Starting validation on target page.");
+			logger.info("POST request detected on target page. Applying filters against input data.");
 	
-			<div class="errors-container">
+			//Validation of the user input
+			String username = request.getParameter("u");
+			String password = request.getParameter("p");
+			String contextPath = "/";
 			
-				<c:if test="${not empty usernameError}">
-					<div class="error-item">
-						<p>${usernameError}</p>
-					</div>
-				</c:if>
+			try {
+				
+				username = username != null ? username.trim() : null;
+				password = password != null ? password.trim() : null;
+				
+				if (username == null || username.isEmpty()
+						|| password == null || password.isEmpty()) {
+				
+					logger.info("Errors detected on target page. Proceeding to generate errors");
 					
-				<c:if test="${not empty passwordError}">
-					<div class="error-item">
-						<p>${passwordError}</p>
-					</div>
-				</c:if>
+					//Map<String, String> errors = new HashMap<String, String>();
+					Cookie usernameCookieError = null;
+					Cookie passwordCookieError = null;
 					
-			</div>
+					if (username == null || username.isEmpty()) {
+						usernameCookieError = new Cookie("username", "username");
+						usernameCookieError.setMaxAge(1);
+						response.addCookie(usernameCookieError);
+					} 
+					
+					if (password == null || password.isEmpty() ) {
+						logger.severe("Bad input for password. Populating cookie");
+						passwordCookieError = new Cookie("password", "password");
+						passwordCookieError.setMaxAge(1);
+						response.addCookie(passwordCookieError);
+					}
+				
+				}
+				
+			} catch (Exception e) {
+				
+				logger.severe("Exception thrown on validation: " + e.getMessage());
+				
+			}
 			
-			<%
+			Connection conn = null;	
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			
+			try {
+				
+				// Driver registration gets autoloaded on JDBC 4.0 compliant versions:
+					
+				// * mysql-connector-java-5.1.36.jar version or higher
+				// * jdk 6 or higher
+					
+				// However, it only gets loaded after second request. At least, in JSP.
+				// This sentence is equivalent to: Class.forName("com.mysql.cj.jdbc.Driver")
+				DriverManager.getDrivers(); 
+				
+				String sql = "SELECT * FROM user WHERE usId = ?";
+				conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ch33tz", "root", "");
+				stmt = conn.prepareStatement(sql);
+				stmt.setInt(1, 4);
+				rs = stmt.executeQuery();
+				
+				while (rs.next()) {
+					logger.info("User id: " + rs.getString("usId"));
+					logger.info("User name: " + rs.getString("usNam"));
+					logger.info("User password: " + rs.getString("usPas"));
+				}
+				
+			} catch (Exception e) {
+				
+				logger.severe("Main exception: " + e.getMessage());
+				
+			} finally {
+				
+				try {
+					
+					if (rs != null) {
+						rs.close();
+					}
+					
+					if (stmt != null) {
+						stmt.close();
+					}
+					
+					if (conn != null) {
+						conn.close();
+					}
+					
+				} catch(Exception e) {
+					
+					logger.severe("Nested exception: " + e.getMessage());
+					
+				}
+				
+			}
+			
+			/*
+			Map errors = (HashMap)request.getAttribute("errors");
+		
+			if (errors != null) {
+				
+			*/
+				%>
+				
+				<!-- 
+				
+				<c:set var = "usernameError" value="${errors.username}" />
+				<c:set var = "passwordError" value="${errors.password}" />
+		
+				<div class="errors-container">
+				
+					<c:if test="${not empty usernameError}">
+						<div class="error-item">
+							<p>${usernameError}</p>
+						</div>
+					</c:if>
+						
+					<c:if test="${not empty passwordError}">
+						<div class="error-item">
+							<p>${passwordError}</p>
+						</div>
+					</c:if>
+						
+				</div>
+				
+				-->
+				
+				<%
+				
+			//}
+			
+			
 			
 		}
 		
@@ -217,7 +339,7 @@
 			</div>
 
 			<!-- Form -->
-			<form name="loginForm" method="post" action="${actionPath}">
+			<form name="loginForm" method="post">
 
 				<div class="inputs-group-div">
 
