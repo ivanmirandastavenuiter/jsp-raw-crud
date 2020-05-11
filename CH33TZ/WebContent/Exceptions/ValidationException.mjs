@@ -26,5 +26,6 @@ export class ValidationException extends Error {
 	static get EMAIL_NOT_MATCH() { return 'Email does not match requirements' };
 	static get PASSWORD_NOT_MATCH() { return 'Password does not match requirements: one lowercase, one uppercase, one number and one special character. 8 characters length' };
 	static get PASSWORD_NOT_EQUAL() { return 'Passwords don\'t match' };
+	static get USER_NOT_FOUND() { return 'User not found in the database' };
 	
 }

@@ -57,4 +57,17 @@ export class ValidationFormException extends ValidationException {
 		
 	}
 	
+	handleUserNotFoundError() {
+		
+		let wrongMessageNode = this.htmlNode;
+		
+		wrongMessageNode.parentElement.style.transition = 'opacity .5s linear';
+		wrongMessageNode.parentElement.style.opacity = 1;
+		wrongMessageNode.parentElement.style.height = 'auto';
+		wrongMessageNode.innerText = this.description;
+		wrongMessageNode.style.padding = '5px';
+		wrongMessageNode.style.height = 'auto';
+		
+	}
+	
 }

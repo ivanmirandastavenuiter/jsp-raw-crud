@@ -29,17 +29,6 @@
 		font-size: 62.5%; /* This is equivalent to 10px */
 		font-family: 'Merriweather', serif;
 	}
-	
-	div.error-item {
-		margin: 20px auto 0 auto;
-    	width: 50%;
-	}
-	
-	div.error-item p {
-	    text-align: center;
-	    color: #e08787;
-	    font-size: 1.4em;
-	}
 
 	div.main-container-div {
 		height: 100%;
@@ -64,6 +53,26 @@
 		padding: 10px;
 		text-align: center;
 		border-radius: 5px 5px 0 0;
+	}
+	
+	div.user-not-found-div {
+		width: 400px;
+		margin: 0 auto;
+		opacity: 0; /* To 1 */
+		transition: opacity .5s linear;
+		font-size: 1.6em;
+		height: 0; /* To auto */
+	}
+	
+	p.user-not-found {
+		margin: 0 auto;
+		padding: 0; /* To 5 */
+		width: 63%;
+		font-size: .7em;
+		border: 1px solid #e21010;
+		color: #e21010;
+		text-align: center;
+		height: 0; /* To auto */
 	}
 
 	div.form-container-div .login-div h1 {
@@ -186,15 +195,15 @@
 	
 	<%
 
-		if (request.getMethod().equals("POST")) {
+		if (request.getMethod().equals("POST") && !(boolean)request.getAttribute("errors")) {
 			
 			Logger logger = Logger.getLogger(com.ch33tz.logger.JspLogger.class.getName()); 
 			logger.info("Starting validation on target page.");
-			logger.info("POST request detected on target page. Applying filters against input data.");
+			logger.info("POST request detected on target page. Applying validation against input data.");
 	
 			//Validation of the user input
-			String username = request.getParameter("u");
-			String password = request.getParameter("p");
+			String username = request.getParameter("username");
+			String password = request.getParameter("pass");
 			String contextPath = "/";
 			
 			try {
@@ -212,13 +221,14 @@
 					Cookie passwordCookieError = null;
 					
 					if (username == null || username.isEmpty()) {
+						logger.warning("Bad input for username. Populating cookie");
 						usernameCookieError = new Cookie("username", "username");
 						usernameCookieError.setMaxAge(1);
 						response.addCookie(usernameCookieError);
 					} 
 					
 					if (password == null || password.isEmpty() ) {
-						logger.severe("Bad input for password. Populating cookie");
+						logger.warning("Bad input for password. Populating cookie");
 						passwordCookieError = new Cookie("password", "password");
 						passwordCookieError.setMaxAge(1);
 						response.addCookie(passwordCookieError);
@@ -236,6 +246,8 @@
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			
+			Map <String, String> userData = new HashMap<String, String>();
+			
 			try {
 				
 				// Driver registration gets autoloaded on JDBC 4.0 compliant versions:
@@ -247,16 +259,33 @@
 				// This sentence is equivalent to: Class.forName("com.mysql.cj.jdbc.Driver")
 				DriverManager.getDrivers(); 
 				
-				String sql = "SELECT * FROM user WHERE usId = ?";
+				String sql = "SELECT * FROM user WHERE usUse = ? AND usPas = ?";
 				conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ch33tz", "root", "");
-				stmt = conn.prepareStatement(sql);
-				stmt.setInt(1, 4);
+				stmt = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+				stmt.setString(1, username);
+				stmt.setString(2, password);
 				rs = stmt.executeQuery();
-				
-				while (rs.next()) {
-					logger.info("User id: " + rs.getString("usId"));
-					logger.info("User name: " + rs.getString("usNam"));
-					logger.info("User password: " + rs.getString("usPas"));
+
+				if (rs.first()) {
+					
+					logger.info("User found: " + rs.getString("usUse") + ". Populating user data.");
+					
+					userData.put("id", Integer.toString(rs.getInt("usId")));
+					userData.put("name", rs.getString("usNam"));
+					userData.put("surname", rs.getString("usSur"));
+					userData.put("username", rs.getString("usUse"));
+					userData.put("email", rs.getString("usEma"));
+					
+					logger.info("Redirecting to welcome page...");
+					
+					request.getSession().setAttribute("user", userData);
+					response.sendRedirect(request.getContextPath() + "/JSP/welcome.jsp");
+					
+				} else {
+					logger.warning("User not found. Populating cookie");
+					Cookie userNotFoundCookie = new Cookie("error", "user-not-found");
+					userNotFoundCookie.setMaxAge(1);
+					response.addCookie(userNotFoundCookie);
 				}
 				
 			} catch (Exception e) {
@@ -287,43 +316,6 @@
 				
 			}
 			
-			/*
-			Map errors = (HashMap)request.getAttribute("errors");
-		
-			if (errors != null) {
-				
-			*/
-				%>
-				
-				<!-- 
-				
-				<c:set var = "usernameError" value="${errors.username}" />
-				<c:set var = "passwordError" value="${errors.password}" />
-		
-				<div class="errors-container">
-				
-					<c:if test="${not empty usernameError}">
-						<div class="error-item">
-							<p>${usernameError}</p>
-						</div>
-					</c:if>
-						
-					<c:if test="${not empty passwordError}">
-						<div class="error-item">
-							<p>${passwordError}</p>
-						</div>
-					</c:if>
-						
-				</div>
-				
-				-->
-				
-				<%
-				
-			//}
-			
-			
-			
 		}
 		
 	%>
@@ -336,6 +328,11 @@
 			<!-- Login div -->
 			<div class="login-div">
 				<h1>Login</h1>
+			</div>
+			
+			<!-- User not found div -->
+			<div class="user-not-found-div">
+				<p class="user-not-found"></p>
 			</div>
 
 			<!-- Form -->

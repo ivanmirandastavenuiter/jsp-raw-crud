@@ -12,6 +12,8 @@
 	<h1>Ch33tz</h1>
 	
 	<p>Building under maintenance</p>
+	
+	<p>User is ${user.id}</p>
 
 </body>
 </html>

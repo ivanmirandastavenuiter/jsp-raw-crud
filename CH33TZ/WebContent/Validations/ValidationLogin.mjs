@@ -75,7 +75,6 @@ document.addEventListener("DOMContentLoaded", function() {
 				
 			}
 
-
 		} catch(validationFormException) {
 			
 			if (validationFormException instanceof ValidationFormException) {
@@ -148,6 +147,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	
 	inputsMap.forEach(validateInputsAfterSubmit);
 	
+	// Control errors from server if detected
 	var controlErrorsFromServer = () => {
 		
 		try { 
@@ -155,48 +155,58 @@ document.addEventListener("DOMContentLoaded", function() {
 			let errorsArray = [];
 			let usernameWrongMessageNode = document.querySelector("p.username-wrong-validation");
 			let passwordWrongMessageNode = document.querySelector("p.password-wrong-validation");
+			let userNotFoundMessageNode = document.querySelector("p.user-not-found");
 			
-			if (availableCookies != undefined && availableCookies != '') {
+			submit = true;
+			
+			errorsArray.push(getCookie('username'));
+			errorsArray.push(getCookie('password'));
+			errorsArray.push(getCookie('error'));
+			
+			var errorsList = (value, key, map) => {
 				
-				submit = true;
-				
-				errorsArray = availableCookies.split(";");
-				
-				var errorsList = (value, key, map) => {
+				try {
 					
-					try {
+					if (value.trim() === "username") {
 						
-						if (value.trim() === "username=username") {
-							
-							throw new ValidationFormException(ValidationException.WARNING, 
-									  ValidationException.USERNAME_EMPTY_FIELD,
-									  usernameWrongMessageNode);
-							
-						}
+						throw new ValidationFormException(ValidationException.WARNING, 
+								  ValidationException.USERNAME_EMPTY_FIELD,
+								  usernameWrongMessageNode);
 						
-						if (value.trim() === "password=password") {
-							
-							throw new ValidationFormException(ValidationException.WARNING, 
-									  ValidationException.PASSWORD_EMPTY_FIELD,
-									  passwordWrongMessageNode);
-							
-						}
+					}
+					
+					if (value.trim() === "password") {
 						
-					} catch(validationFormException){
+						throw new ValidationFormException(ValidationException.WARNING, 
+								  ValidationException.PASSWORD_EMPTY_FIELD,
+								  passwordWrongMessageNode);
 						
-						if (validationFormException instanceof ValidationFormException) {
-							validationFormException.handleLoginErrorAfterSubmit();
+					}
+					
+					if (value.trim() === "user-not-found") {
+						
+						throw new ValidationFormException(ValidationException.WARNING, 
+								  ValidationException.USER_NOT_FOUND,
+								  userNotFoundMessageNode);
+						
+					}
+					
+				} catch(validationFormException){
+					if (validationFormException instanceof ValidationFormException) {
+						if (value.trim() === "user-not-found") {
+							validationFormException.handleUserNotFoundError();
 						} else {
-							throw validationFormException;
+							validationFormException.handleLoginErrorAfterSubmit();
 						}
-						
+					} else {
+						throw validationFormException;
 					}
 					
 				}
 				
-				errorsArray.forEach(errorsList);
-				
 			}
+			
+			errorsArray.forEach(errorsList);
 			
 		} catch(err) {
 			
@@ -208,41 +218,37 @@ document.addEventListener("DOMContentLoaded", function() {
 		} 
 		
 	}
-	
-	controlErrorsFromServer();
-	
+
+	// Snippet to get cookies by name
 	var getCookie = (cookieName) => {
+			
+		let cookieNameStartingIndex = availableCookies.indexOf(cookieName);
+		let cookieValueStartingIndex = cookieNameStartingIndex + cookieName.length + 1;
+		let charIndex = cookieValueStartingIndex;
+		let endIndex = availableCookies.length;
+		let cookieValue = '';
 		
-		if (availableCookies != undefined && availableCookies != '') {
+		if (cookieNameStartingIndex != -1) {
 			
-			let cookieNameStartingIndex = availableCookies.indexOf(cookieName);
-			let cookieValueStartingIndex = cookieNameStartingIndex + cookieName.length + 1;
-			let charIndex = cookieValueStartingIndex;
-			let endIndex = availableCookies.length;
-			let cookieValue = '';
-			
-			if (cookieNameStartingIndex != -1) {
-				
-				while(availableCookies.charAt(charIndex) != ";" && charIndex != endIndex) {
-					console.log(availableCookies.charAt(charIndex))
-					cookieValue += availableCookies.charAt(charIndex);
-					charIndex++;
-				}
-				
-				return cookieValue.trim();
-			
-			} else {
-				
-				return 'Cookie not found';
-				
+			while(availableCookies.charAt(charIndex) != ";" && charIndex != endIndex) {
+				cookieValue += availableCookies.charAt(charIndex);
+				charIndex++;
 			}
+			
+			return cookieValue.trim();
+		
+		} else {
+			
+			return 'Cookie not found';
 			
 		}
 		
 	}
 	
-	let cookieValue = getCookie('password');
-	console.log(cookieValue);
+	// If cookies detected, validation thrown
+	if (availableCookies != undefined && availableCookies != '') {
+		controlErrorsFromServer();
+	}
 	
 });
 

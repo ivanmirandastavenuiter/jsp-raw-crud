@@ -18,6 +18,8 @@ document.addEventListener("DOMContentLoaded", function() {
 	// Flag for execution at sending time
 	let submit = false;
 	
+	var availableCookies = document.cookie;
+	
 	// Set a useful and easy-handling capturing element / Credits: Javascript Teacher @js_tut
 
 	let id = (v) => document.getElementById(v);
@@ -37,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	let usernameNode = name("username")[0];
 	let wrongUsernameNode = className("username-wrong-validation")[0];
 	
-	let phoneNode = name("phone")[0]
+	let phoneNode = name("phone")[0];
 	let wrongPhoneNode = className("phone-wrong-validation")[0];
 	
 	let emailNode = name("email")[0];
@@ -271,7 +273,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		try {
 			
 			submit = true;
-			
+			validation = true;
 			inputsMap.forEach(cleanPossibleJSInjections);
 			inputsMap.forEach(validateInputs);
 			
@@ -435,6 +437,161 @@ document.addEventListener("DOMContentLoaded", function() {
 	}
 	
 	inputsMap.forEach(validateInputsAfterSubmit);
+	
+	// Control errors from server if detected
+	var controlErrorsFromServer = () => {
+		
+		try { 
+			
+			let errorsArray = [];
+			let nameWrongMessageNode = document.querySelector("p.name-wrong-validation").parentElement;
+			let surnameWrongMessageNode = document.querySelector("p.surname-wrong-validation").parentElement;
+			let usernameWrongMessageNode = document.querySelector("p.username-wrong-validation").parentElement;
+			let phoneWrongMessageNode = document.querySelector("p.phone-wrong-validation").parentElement;
+			let emailWrongMessageNode = document.querySelector("p.email-wrong-validation").parentElement;
+			let passwordWrongMessageNode = document.querySelector("p.password-wrong-validation").parentElement;
+			let confirmWrongMessageNode = document.querySelector("p.confirm-wrong-validation").parentElement;
+			
+			submit = true;
+			
+			errorsArray.push(getCookie('name'));
+			errorsArray.push(getCookie('surname'));
+			errorsArray.push(getCookie('username'));
+			errorsArray.push(getCookie('phone'));
+			errorsArray.push(getCookie('email'));
+			errorsArray.push(getCookie('password'));
+			errorsArray.push(getCookie('confirm'));
+			
+			var errorsList = (value, key, map) => {
+				
+				try {
+					
+					if (value.trim() === "name") {
+						
+						throw new ValidationFormException(ValidationException.WARNING, 
+								  ValidationException.NAME_EMPTY_FIELD,
+								  nameWrongMessageNode);
+						
+					} else if (value.trim() === "surname") {
+						
+						throw new ValidationFormException(ValidationException.WARNING, 
+								  ValidationException.SURNAME_EMPTY_FIELD,
+								  surnameWrongMessageNode);
+						
+					} else if (value.trim() === "username") {
+						
+						throw new ValidationFormException(ValidationException.WARNING, 
+								  ValidationException.USERNAME_EMPTY_FIELD,
+								  usernameWrongMessageNode);
+						
+					} else if (key === 3 && value.trim() === "empty") {
+						
+						throw new ValidationFormException(ValidationException.WARNING, 
+								  ValidationException.PHONE_EMPTY_FIELD,
+								  phoneWrongMessageNode);
+						
+					} else if (key === 3 && value.trim() === "regex-fail") {
+						
+						throw new ValidationFormException(ValidationException.WARNING, 
+								  ValidationException.PHONE_NOT_MATCH,
+								  phoneWrongMessageNode);
+						
+					} else if (key === 4 && value.trim() === "empty") {
+						
+						throw new ValidationFormException(ValidationException.WARNING, 
+								  ValidationException.EMAIL_EMPTY_FIELD,
+								  emailWrongMessageNode);
+						
+					} else if (key === 4 && value.trim() === "regex-fail") {
+						
+						throw new ValidationFormException(ValidationException.WARNING, 
+								  ValidationException.EMAIL_NOT_MATCH,
+								  emailWrongMessageNode);
+						
+					} else if (key === 5 && value.trim() === "empty") {
+						
+						throw new ValidationFormException(ValidationException.WARNING, 
+								  ValidationException.PASSWORD_EMPTY_FIELD,
+								  passwordWrongMessageNode);
+						
+					} else if (key === 5 && value.trim() === "regex-fail") {
+						
+						throw new ValidationFormException(ValidationException.WARNING, 
+								  ValidationException.PASSWORD_NOT_MATCH,
+								  passwordWrongMessageNode);
+						
+					} else if (value.trim() === "confirm") {
+						
+						throw new ValidationFormException(ValidationException.WARNING, 
+								  ValidationException.CONFIRM_EMPTY_FIELD,
+								  confirmWrongMessageNode);
+						
+					} else if (key === 5 && value.trim() === "not-equal") {
+						
+						throw new ValidationFormException(ValidationException.WARNING, 
+								  ValidationException.PASSWORD_NOT_EQUAL,
+								  confirmWrongMessageNode.parentElement);
+						
+					}
+					
+				} catch(validationFormException){
+
+					if (validationFormException instanceof ValidationFormException) {
+						console.log(value);
+						console.log(key);
+						validationFormException.handleRegisterErrorOnSubmit();
+						validation = false;
+					} else {
+						throw validationFormException;
+					}
+					
+				}
+				
+			}
+			
+			errorsArray.forEach(errorsList);
+			
+		} catch(err) {
+			
+			console.log('Exception thrown by parent try/catch block: ');
+			console.log('Name: ' + err.name);
+			console.log('Description: ' + err.message);
+			console.log('Stack: ' + err.stack);
+				
+		} 
+		
+	}
+
+	// Snippet to get cookies by name
+	var getCookie = (cookieName) => {
+			
+		let cookieNameStartingIndex = availableCookies.indexOf(cookieName);
+		let cookieValueStartingIndex = cookieNameStartingIndex + cookieName.length + 1;
+		let charIndex = cookieValueStartingIndex;
+		let endIndex = availableCookies.length;
+		let cookieValue = '';
+		
+		if (cookieNameStartingIndex != -1) {
+			
+			while(availableCookies.charAt(charIndex) != ";" && charIndex != endIndex) {
+				cookieValue += availableCookies.charAt(charIndex);
+				charIndex++;
+			}
+			
+			return cookieValue.trim();
+		
+		} else {
+			
+			return 'Cookie not found';
+			
+		}
+		
+	}
+	
+	// If cookies detected, validation thrown
+	if (availableCookies != undefined && availableCookies != '') {
+		controlErrorsFromServer();
+	}
 	
 });
 

@@ -15,6 +15,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Cookie;
 
 import com.ch33tz.logger.JspLogger;
 
@@ -47,7 +48,7 @@ public class LoginFilter implements Filter {
 	 */
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		
-		logger.info("Starting validation on filter.");
+		logger.info("Starting validation on login filter.");
 		
 		HttpServletRequest httpServletRequest = (HttpServletRequest)request;
 		HttpServletResponse httpServletResponse = (HttpServletResponse)response;
@@ -73,24 +74,33 @@ public class LoginFilter implements Filter {
 				
 				logger.info("Errors detected on login form. Redirecting to index from filter.");
 				
-				Map<String, String> errors = new HashMap<String, String>();
+				Cookie usernameCookieError = null;
+				Cookie passwordCookieError = null;
 				
 				if (username == null || username.isEmpty()) {
-					errors.put("username", "Error on username. Empty.");
+					logger.warning("Bad input for username. Populating cookie");
+					usernameCookieError = new Cookie("username", "username");
+					usernameCookieError.setMaxAge(1);
+					httpServletResponse.addCookie(usernameCookieError);
 				} 
 				
 				if (password == null || password.isEmpty() ) {
-					errors.put("password", "Error on password. Empty.");
+					logger.warning("Bad input for password. Populating cookie");
+					passwordCookieError = new Cookie("password", "password");
+					passwordCookieError.setMaxAge(1);
+					httpServletResponse.addCookie(passwordCookieError);
 				}
 				
-				httpServletRequest.setAttribute("errors", errors);
+				httpServletRequest.setAttribute("errors", true);
 	            RequestDispatcher rd = httpServletRequest.getRequestDispatcher(contextPath);
 	            rd.forward(httpServletRequest, httpServletResponse);
+	            return;
 
 			}
 			
 			logger.info("Validation passed on filtering. Forwarding to target page.");
-			chain.doFilter(request, response);
+			httpServletRequest.setAttribute("errors", false);
+			chain.doFilter(httpServletRequest, httpServletResponse);
 			
 		}
 		
