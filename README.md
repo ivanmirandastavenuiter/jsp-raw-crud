@@ -22,6 +22,7 @@ A crud based on Java Server Pages to show basic interactions with Java web featu
 * Creation and customizing of LoginFilter filter type class (javax.servlet.Filters).
 * Implementation of logger actions.
 * **Second security validation layer**: first tier is performed at client with **JavaScript**. Second is done with **filters**.
+* **Third security validation layer**: implementing on registration form. Almost done.
 
 Third application security tier to be implemented through Java on plain JSP files.
 
