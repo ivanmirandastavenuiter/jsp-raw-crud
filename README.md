@@ -35,6 +35,7 @@ Third application security tier to be implemented through Java on plain JSP file
 3. Show values introduced by user on forms when reloaded.
 4. Exception pages!!
 5. Logger unification.
+6. Injections code.
 
 :boom::boom::boom::boom::boom::boom::boom:
 
