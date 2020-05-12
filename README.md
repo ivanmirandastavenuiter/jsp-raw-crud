@@ -2,6 +2,8 @@
 
 A crud based on Java Server Pages to show basic interactions with Java web features and classes.
 
+Updates will be upload soon.
+
 ## Implicit objects on JSP
 
 * request --> **HttpServletRequest**
