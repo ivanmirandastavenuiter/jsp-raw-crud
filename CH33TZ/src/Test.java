@@ -34,11 +34,32 @@ public class Test {
 //		String otherRegex = "^[\\w\\d\\\\\\^\\$\\.\\|\\?\\*\\+\\(\\)\\[\\{\\}\\]\\/\\-!'·%&=¿`´Çç_.;:,]+@[\\w\\d\\.\\-]+\\.[a-z]{2,3}$";
 //		pattern = Pattern.compile(otherRegex);
 //		matcher = pattern.matcher("d.d.d.dgmail.com");
-		String passwordRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\\$%\\^&\\*])(?=\\S+$)(.{8,})";
-		Pattern pattern = Pattern.compile(passwordRegex);
-		Matcher matcher = pattern.matcher("Mirda!!!!900");
-		System.out.println(matcher.matches());
+		String injectionRegex = "((<[^>]*(>|$))|(&lt;?(?!&gt;?)(.*(&gt;?){1}|.*$))|(&#0*60(?!&#0*62)(.*(&#0*62){1}|.*$))|(&#x0*3c(?!&#x0*3e)(.*(&#x0*3e){1}|.*$)))";
+		Pattern pattern = Pattern.compile(injectionRegex);
 		
+		Matcher matcher = pattern.matcher("&lt;script&gt;console.log('tumadre')&lt;/script&gt;");
+		System.out.println("Scripts con &lt; y &gt;: " + matcher.find());
+		matcher = pattern.matcher("&ltscript&gtconsole.log('tumadre')&lt/script&gt");
+		System.out.println("Scripts con &lt y &gt: " + matcher.find());
+		matcher = pattern.matcher("&#60script&#62console.log('tumadre')&#60/script&#62");
+		System.out.println("Scripts con &#60 y &#62: " + matcher.find());
+		matcher = pattern.matcher("&#xcscript&#x3onsole.log('tumadre')&#x3/script&#x3");
+		System.out.println("Scripts con &#x3c y &#x3e: " + matcher.find());
+		matcher = pattern.matcher("&#000060script&#0062console.log('tumadre')&#0060/script&#0062");
+		System.out.println("Scripts con overflow de 0 en &#60 y &#62: " + matcher.find());
+		matcher = pattern.matcher("&#x000003cscript&#x0003econsole.log('tumadre')&#x000003c/script&#x0000003e");
+		System.out.println("Scripts con overflow de 0 en &#x3c y &#x3e: " + matcher.find());
+		matcher = pattern.matcher("<script>console.log('tumadre')</script>");
+		System.out.println("Scripts con < y >: " + matcher.find());
+		matcher = pattern.matcher("wareber");
+		System.out.println("Scripts sin nada: " + matcher.find());
+		
+		String script = "<script>console.log('tumadre')</script>";
+		script = script.replaceAll("<", "");
+		System.out.println(script);
+		script = script.replaceAll(">", "");
+		System.out.println(script);
+		System.out.println("&#dsadsa".substring(0, 2));
 		
 	}
 

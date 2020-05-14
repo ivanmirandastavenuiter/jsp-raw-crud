@@ -247,10 +247,12 @@ document.addEventListener("DOMContentLoaded", function() {
 			}
 			
 			if (passwordValue !== undefined && confirmValue !== undefined) {
-				if (passwordValue !== confirmValue && regExpForPassword.test(passwordValue)) {
-					throw new ValidationFormException(ValidationException.WARNING, 
-													  ValidationException.PASSWORD_NOT_EQUAL,
-													  inputContainerNode);
+				if (key.trim() === 'password' || key.trim() === 'confirm') {
+					if (passwordValue !== confirmValue && regExpForPassword.test(passwordValue)) {
+						throw new ValidationFormException(ValidationException.WARNING, 
+														  ValidationException.PASSWORD_NOT_EQUAL,
+														  inputContainerNode);
+					}
 				}
 			}
 			
@@ -274,7 +276,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			
 			submit = true;
 			validation = true;
-			inputsMap.forEach(cleanPossibleJSInjections);
+			//inputsMap.forEach(cleanPossibleJSInjections);
 			inputsMap.forEach(validateInputs);
 			
 			return validation;
@@ -403,24 +405,27 @@ document.addEventListener("DOMContentLoaded", function() {
 							
 					}
 					
-					if (passwordValue !== undefined && confirmValue !== undefined) {
-						if (regExpForPassword.test(passwordValue)) {
-							if (passwordValue.length > 0 && confirmValue.length > 0) {
-								if (passwordValue !== confirmValue) {
-									throw new ValidationFormException(ValidationException.WARNING, 
-																	  ValidationException.PASSWORD_NOT_EQUAL,
-																	  inputContainerNode);
-								} else {
-									resetNode(inputContainerNode);
-									let resetPasswordNode = (function() {
-										wrongPasswordNode.children[0].innerText = '';
-										wrongPasswordNode.parentElement.style.transition = 'none';
-										wrongPasswordNode.parentElement.style.opacity = 0;
-									})();
+					if (key === 'password' || key === 'confirm') {
+						if (passwordValue !== undefined && confirmValue !== undefined) {
+							if (regExpForPassword.test(passwordValue)) {
+								if (passwordValue.length > 0 && confirmValue.length > 0) {
+									if (passwordValue !== confirmValue) {
+										throw new ValidationFormException(ValidationException.WARNING, 
+																		  ValidationException.PASSWORD_NOT_EQUAL,
+																		  inputContainerNode);
+									} else {
+										resetNode(inputContainerNode);
+										let resetPasswordNode = (function() {
+											wrongPasswordNode.children[0].innerText = '';
+											wrongPasswordNode.parentElement.style.transition = 'none';
+											wrongPasswordNode.parentElement.style.opacity = 0;
+										})();
+									}
 								}
 							}
 						}
 					}
+					
 					
 				}
 				
@@ -484,6 +489,12 @@ document.addEventListener("DOMContentLoaded", function() {
 								  ValidationException.USERNAME_EMPTY_FIELD,
 								  usernameWrongMessageNode);
 						
+					} else if (key === 2 && value.trim() === "exists") {
+						
+						throw new ValidationFormException(ValidationException.WARNING, 
+								  ValidationException.USERNAME_EXISTS,
+								  usernameWrongMessageNode);
+						
 					} else if (key === 3 && value.trim() === "empty") {
 						
 						throw new ValidationFormException(ValidationException.WARNING, 
@@ -496,6 +507,12 @@ document.addEventListener("DOMContentLoaded", function() {
 								  ValidationException.PHONE_NOT_MATCH,
 								  phoneWrongMessageNode);
 						
+					} else if (key === 3 && value.trim() === "exists") {
+						
+						throw new ValidationFormException(ValidationException.WARNING, 
+								  ValidationException.PHONE_EXISTS,
+								  phoneWrongMessageNode);
+						
 					} else if (key === 4 && value.trim() === "empty") {
 						
 						throw new ValidationFormException(ValidationException.WARNING, 
@@ -506,6 +523,12 @@ document.addEventListener("DOMContentLoaded", function() {
 						
 						throw new ValidationFormException(ValidationException.WARNING, 
 								  ValidationException.EMAIL_NOT_MATCH,
+								  emailWrongMessageNode);
+						
+					} else if (key === 4 && value.trim() === "exists") {
+						
+						throw new ValidationFormException(ValidationException.WARNING, 
+								  ValidationException.EMAIL_EXISTS,
 								  emailWrongMessageNode);
 						
 					} else if (key === 5 && value.trim() === "empty") {
@@ -530,7 +553,7 @@ document.addEventListener("DOMContentLoaded", function() {
 						
 						throw new ValidationFormException(ValidationException.WARNING, 
 								  ValidationException.PASSWORD_NOT_EQUAL,
-								  confirmWrongMessageNode.parentElement);
+								  confirmWrongMessageNode);
 						
 					}
 					

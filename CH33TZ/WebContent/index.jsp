@@ -29,8 +29,30 @@
 		font-size: 62.5%; /* This is equivalent to 10px */
 		font-family: 'Merriweather', serif;
 	}
-
+	
 	div.main-container-div {
+		height: 100%;
+	}
+	
+	div.register-result-container {
+		margin-top: 50px;
+	}
+	
+	div.register-result-message {
+		width: 50%;
+		margin: 0 auto;
+		font-size: 1.6em;
+		color: #77d54d;
+		border: 1px solid #77d54d;
+		border-radius: 20px;
+	}
+	
+	div.register-result-message p {
+		text-align: center;
+		padding: 5px;
+	}
+
+	div.main-content-div {
 		height: 100%;
 		display: flex;
 		justify-content: center;
@@ -194,10 +216,11 @@
 	<c:set var = "contextPath" value="${pageContext.request.contextPath}" />
 	
 	<%
+	
+		Logger logger = Logger.getLogger(com.ch33tz.logger.JspLogger.class.getName()); 
 
 		if (request.getMethod().equals("POST") && !(boolean)request.getAttribute("errors")) {
 			
-			Logger logger = Logger.getLogger(com.ch33tz.logger.JspLogger.class.getName()); 
 			logger.info("Starting validation on target page.");
 			logger.info("POST request detected on target page. Applying validation against input data.");
 	
@@ -205,18 +228,25 @@
 			String username = request.getParameter("username");
 			String password = request.getParameter("pass");
 			String contextPath = "/";
+			boolean validation = true;
 			
 			try {
 				
 				username = username != null ? username.trim() : null;
 				password = password != null ? password.trim() : null;
 				
+				if (request.getAttribute("userInput") == null) {
+					Map <String, String> userInput = new HashMap<String, String>();
+					userInput.put("username", username);
+					userInput.put("password", password);
+					request.setAttribute("userInput", userInput);
+				}
+				
 				if (username == null || username.isEmpty()
 						|| password == null || password.isEmpty()) {
 				
 					logger.info("Errors detected on target page. Proceeding to generate errors");
 					
-					//Map<String, String> errors = new HashMap<String, String>();
 					Cookie usernameCookieError = null;
 					Cookie passwordCookieError = null;
 					
@@ -225,6 +255,7 @@
 						usernameCookieError = new Cookie("username", "username");
 						usernameCookieError.setMaxAge(1);
 						response.addCookie(usernameCookieError);
+						validation = false;
 					} 
 					
 					if (password == null || password.isEmpty() ) {
@@ -232,6 +263,7 @@
 						passwordCookieError = new Cookie("password", "password");
 						passwordCookieError.setMaxAge(1);
 						response.addCookie(passwordCookieError);
+						validation = false;
 					}
 				
 				}
@@ -242,138 +274,160 @@
 				
 			}
 			
-			Connection conn = null;	
-			PreparedStatement stmt = null;
-			ResultSet rs = null;
-			
-			Map <String, String> userData = new HashMap<String, String>();
-			
-			try {
+			if (validation) {
 				
-				// Driver registration gets autoloaded on JDBC 4.0 compliant versions:
-					
-				// * mysql-connector-java-5.1.36.jar version or higher
-				// * jdk 6 or higher
-					
-				// However, it only gets loaded after second request. At least, in JSP.
-				// This sentence is equivalent to: Class.forName("com.mysql.cj.jdbc.Driver")
-				DriverManager.getDrivers(); 
+				Connection conn = null;	
+				PreparedStatement stmt = null;
+				ResultSet rs = null;
 				
-				String sql = "SELECT * FROM user WHERE usUse = ? AND usPas = ?";
-				conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ch33tz", "root", "");
-				stmt = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-				stmt.setString(1, username);
-				stmt.setString(2, password);
-				rs = stmt.executeQuery();
-
-				if (rs.first()) {
-					
-					logger.info("User found: " + rs.getString("usUse") + ". Populating user data.");
-					
-					userData.put("id", Integer.toString(rs.getInt("usId")));
-					userData.put("name", rs.getString("usNam"));
-					userData.put("surname", rs.getString("usSur"));
-					userData.put("username", rs.getString("usUse"));
-					userData.put("email", rs.getString("usEma"));
-					
-					logger.info("Redirecting to welcome page...");
-					
-					request.getSession().setAttribute("user", userData);
-					response.sendRedirect(request.getContextPath() + "/JSP/welcome.jsp");
-					
-				} else {
-					logger.warning("User not found. Populating cookie");
-					Cookie userNotFoundCookie = new Cookie("error", "user-not-found");
-					userNotFoundCookie.setMaxAge(1);
-					response.addCookie(userNotFoundCookie);
-				}
-				
-			} catch (Exception e) {
-				
-				logger.severe("Main exception: " + e.getMessage());
-				
-			} finally {
+				Map <String, String> userData = new HashMap<String, String>();
 				
 				try {
 					
-					if (rs != null) {
-						rs.close();
+					// Driver registration gets autoloaded on JDBC 4.0 compliant versions:
+						
+					// * mysql-connector-java-5.1.36.jar version or higher
+					// * jdk 6 or higher
+						
+					// However, it only gets loaded after second request. At least, in JSP.
+					// This sentence is equivalent to: Class.forName("com.mysql.cj.jdbc.Driver")
+					DriverManager.getDrivers(); 
+					
+					String sql = "SELECT * FROM user WHERE usUse = ? AND usPas = ?";
+					conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ch33tz", "root", "");
+					stmt = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+					stmt.setString(1, username);
+					stmt.setString(2, password);
+					rs = stmt.executeQuery();
+
+					if (rs.first()) {
+						
+						logger.info("User found: " + rs.getString("usUse") + ". Populating user data.");
+						
+						userData.put("id", Integer.toString(rs.getInt("usId")));
+						userData.put("name", rs.getString("usNam"));
+						userData.put("surname", rs.getString("usSur"));
+						userData.put("username", rs.getString("usUse"));
+						userData.put("email", rs.getString("usEma"));
+						
+						logger.info("Redirecting to welcome page...");
+						
+						request.getSession().setAttribute("user", userData);
+						response.sendRedirect(request.getContextPath() + "/JSP/welcome.jsp");
+						
+					} else {
+						logger.warning("User not found. Populating cookie");
+						logger.info("Returning to login form.");
+						Cookie userNotFoundCookie = new Cookie("error", "user-not-found");
+						userNotFoundCookie.setMaxAge(1);
+						response.addCookie(userNotFoundCookie);
 					}
 					
-					if (stmt != null) {
-						stmt.close();
+				} catch (Exception e) {
+					
+					logger.severe("Main exception: " + e.getMessage());
+					
+				} finally {
+					
+					try {
+						
+						if (rs != null) {
+							rs.close();
+						}
+						
+						if (stmt != null) {
+							stmt.close();
+						}
+						
+						if (conn != null) {
+							conn.close();
+						}
+						
+					} catch(Exception e) {
+						
+						logger.severe("Nested exception: " + e.getMessage());
+						
 					}
-					
-					if (conn != null) {
-						conn.close();
-					}
-					
-				} catch(Exception e) {
-					
-					logger.severe("Nested exception: " + e.getMessage());
 					
 				}
 				
 			}
-			
-		}
+						
+		} 
 		
 	%>
-
+	
 	<!-- Main container -->
 	<div class="main-container-div">
-
-		<div class="form-container-div">
 	
-			<!-- Login div -->
-			<div class="login-div">
-				<h1>Login</h1>
+		<!-- Errors container -->
+		<c:if test="${ not empty message}">
+			<div class="register-result-container">
+				<div class="register-result-message">
+					<p>${message}</p>
+					<c:remove var="message" />
+				</div>
 			</div>
-			
-			<!-- User not found div -->
-			<div class="user-not-found-div">
-				<p class="user-not-found"></p>
-			</div>
-
-			<!-- Form -->
-			<form name="loginForm" method="post">
-
-				<div class="inputs-group-div">
-
-					<!-- Input items -->
-					<div class="input-div">
-						<label for="username">Username</label>
-						<input class="form-input" type="text" name="username"/>
-					</div>
-
-					<div class="username-wrong-validation-div">
-						<p class="username-wrong-validation"></p>
+		</c:if>
+	
+		<!-- Main content -->
+		<div class="main-content-div">
+	
+			<div class="form-container-div">
+		
+				<!-- Login div -->
+				<div class="login-div">
+					<h1>Login</h1>
+				</div>
+				
+				<!-- User not found div -->
+				<div class="user-not-found-div">
+					<p class="user-not-found"></p>
+				</div>
+	
+				<!-- Form -->
+				<form name="loginForm" method="post">
+	
+					<div class="inputs-group-div">
+	
+						<!-- Input items -->
+						<div class="input-div">
+							<label for="username">Username</label>
+							<input class="form-input" type="text" name="username" value="${userInput.username}" />
+						</div>
+	
+						<div class="username-wrong-validation-div">
+							<p class="username-wrong-validation"></p>
+						</div>
+					
+						<div class="input-div">
+							<label for="pass">Password</label>
+							<input class="form-input" type="password" name="pass" value="${userInput.password}" />
+						</div>
+	
+						<div class="password-wrong-validation-div">
+							<p class="password-wrong-validation"></p>
+						</div>
+						
+						<div class="input-div">
+							<input class="submit-btn" type="submit" value="Submit"/>
+						</div>
+	
+						<div class="register-link-div">
+							<span><a href="register.jsp">I'm not a user yet</a></span>
+						</div>
+	
 					</div>
 				
-					<div class="input-div">
-						<label for="pass">Password</label>
-						<input class="form-input" type="password" name="pass"/>
-					</div>
-
-					<div class="password-wrong-validation-div">
-						<p class="password-wrong-validation"></p>
-					</div>
-					
-					<div class="input-div">
-						<input class="submit-btn" type="submit" value="Submit"/>
-					</div>
-
-					<div class="register-link-div">
-						<span><a href="register.jsp">I'm not a user yet</a></span>
-					</div>
-
-				</div>
+				</form>
+	
+			</div>
 			
-			</form>
-
 		</div>
 		
 	</div>
+
+	
 	
 </body>
 </html>

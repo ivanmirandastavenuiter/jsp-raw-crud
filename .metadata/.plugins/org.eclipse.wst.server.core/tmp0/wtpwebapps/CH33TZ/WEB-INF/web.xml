@@ -12,7 +12,7 @@
 	   <filter-name>LoginFilter</filter-name>
 	   <url-pattern>/index.jsp</url-pattern>
 	</filter-mapping>
-	
+
 	<filter>
 	    <filter-name>RegisterFilter</filter-name>
 	    <filter-class>com.ch33tz.filters.RegisterFilter</filter-class>

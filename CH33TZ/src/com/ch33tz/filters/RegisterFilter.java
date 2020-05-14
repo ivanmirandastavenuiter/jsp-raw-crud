@@ -1,6 +1,8 @@
 package com.ch33tz.filters;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -62,13 +64,15 @@ public class RegisterFilter implements Filter {
 			
 			logger.info("POST request detected on index page. Applying filters against input data.");
 			
-			String name = httpServletRequest.getParameter("n");
-			String surname = httpServletRequest.getParameter("s");
-			String username = httpServletRequest.getParameter("u");
-			String phone = httpServletRequest.getParameter("p");
-			String email = httpServletRequest.getParameter("e");
-			String password = httpServletRequest.getParameter("pa");
-			String confirm = httpServletRequest.getParameter("c");
+			Map <String, String> userInput = new HashMap<String, String>();
+			
+			String name = httpServletRequest.getParameter("name");
+			String surname = httpServletRequest.getParameter("surname");
+			String username = httpServletRequest.getParameter("username");
+			String phone = httpServletRequest.getParameter("phone");
+			String email = httpServletRequest.getParameter("email");
+			String password = httpServletRequest.getParameter("password");
+			String confirm = httpServletRequest.getParameter("confirm");
 			String contextPath = "/register.jsp";
 			
 			name = name != null ? name.trim() : null;
@@ -88,6 +92,15 @@ public class RegisterFilter implements Filter {
 			Cookie passwordCookieError = null;
 			Cookie confirmCookieError = null;
 			Cookie passwordsNotEqualError = null;
+			
+			userInput.put("name", name);
+			userInput.put("surname", surname);
+			userInput.put("username", username);
+			userInput.put("phone", phone);
+			userInput.put("email", email);
+			userInput.put("password", password);
+			userInput.put("confirm", confirm);
+			httpServletRequest.setAttribute("userInput", userInput);
 			
 			Pattern pattern;
 			Matcher matcher;
@@ -190,15 +203,19 @@ public class RegisterFilter implements Filter {
 				validation = false;
 			}
 			
-			pattern = Pattern.compile(passwordRegex);
-			matcher = pattern.matcher(password);
-			
-			if (!password.equals(confirm) && matcher.matches()) {
-				logger.warning("Password does not match confirmation field.");
-				passwordCookieError = new Cookie("password", "not-equal");
-				passwordCookieError.setMaxAge(1);
-				httpServletResponse.addCookie(passwordCookieError);
-				validation = false;
+			if (password != null && !password.isEmpty()) {
+				
+				pattern = Pattern.compile(passwordRegex);
+				matcher = pattern.matcher(password);
+				
+				if (!password.equals(confirm) && matcher.matches()) {
+					logger.warning("Password does not match confirmation field.");
+					passwordsNotEqualError = new Cookie("password", "not-equal");
+					passwordsNotEqualError.setMaxAge(1);
+					httpServletResponse.addCookie(passwordsNotEqualError);
+					validation = false;
+				}
+				
 			}
 			
 			if (validation) {
@@ -206,6 +223,7 @@ public class RegisterFilter implements Filter {
 				httpServletRequest.setAttribute("errors", false);
 				chain.doFilter(httpServletRequest, httpServletResponse);
 			} else {
+				logger.info("Validation not passed. Returning to register form from filter.");
 				httpServletRequest.setAttribute("errors", true);
 	            RequestDispatcher rd = httpServletRequest.getRequestDispatcher(contextPath);
 	            rd.forward(httpServletRequest, httpServletResponse);
