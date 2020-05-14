@@ -28,14 +28,20 @@ Updates will be upload soon.
 
 Third application security tier to be implemented through Java on plain JSP files.
 
-**TODOs**
+**COMPLETED**
 
 1. Implement validation on register for unique usernames, email and phone. Done --> 5/12
 2. Connect previous through JavaScript. Cookies maybe. Done --> 5/12
 3. Show values introduced by user on forms when reloaded. Done --> 5/12
-4. Exception pages!! Include SQL Exceptions also.
-5. Logger unification.
+4. Exception handling. Done --> 5/14
+5. Logger unification. Done --> 5/14
 6. Injections code. Done --> 5/14
+
+**TODOs**
+
+1. Custom exceptions/Custom pages.
+2. BouncyCastle AES encryption for passwords.
+3. Correct dangerous casts to Object.
 
 :boom::boom::boom::boom::boom::boom::boom:
 
