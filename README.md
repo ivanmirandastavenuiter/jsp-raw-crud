@@ -33,9 +33,9 @@ Third application security tier to be implemented through Java on plain JSP file
 1. Implement validation on register for unique usernames, email and phone. Done --> 5/12
 2. Connect previous through JavaScript. Cookies maybe. Done --> 5/12
 3. Show values introduced by user on forms when reloaded. Done --> 5/12
-4. Exception pages!!
+4. Exception pages!! Include SQL Exceptions also.
 5. Logger unification.
-6. Injections code.
+6. Injections code. Done --> 5/14
 
 :boom::boom::boom::boom::boom::boom::boom:
 
