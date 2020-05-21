@@ -1,8 +1,10 @@
-# JSP raw crud
+# CH33TZ PROJECT - JSP RAW CRUD
 
-A crud based on Java Server Pages to show basic interactions with Java web features and classes.
+A crud based on Java Server Pages to show basic interactions with Java web features and classes. 
 
-Updates will be upload soon.
+It is also the beginning of CH33TZ project taking shape.
+
+LAST UPDATE :point_right: 5/21
 
 ## Implicit objects on JSP
 
@@ -16,17 +18,20 @@ Updates will be upload soon.
 * page --> **Object**
 * exception --> **Throwable**
 
-## Fist steps
+## Production steps
 
-**Application of filters in Login page**. This includes:
+**Login/Register structure implmented**. This includes:
 
-* Configuration of filters in web.xml file.
-* Creation and customizing of LoginFilter filter type class (javax.servlet.Filters).
+* Views for user interfaces in JSP.
+* Configuration of filters in web.xml file. LoginFilter and RegisterFilter (javax.servlet.Filters).
 * Implementation of logger actions.
-* **Second security validation layer**: first tier is performed at client with **JavaScript**. Second is done with **filters**.
-* **Third security validation layer**: implementing on registration form. Almost done.
+* Exception handling.
+* **First security validation layer**: JavaScript on the client.
+* **Second security validation layer**: Java **filters**.
+* **Third security validation layer**: Java scripts directly on JSP.
+* **Fourth security validation layer**: Triggers on database.
 
-Third application security tier to be implemented through Java on plain JSP files.
+**Inserting design on pages with CSS and HTML**.
 
 **COMPLETED**
 
@@ -36,12 +41,13 @@ Third application security tier to be implemented through Java on plain JSP file
 4. Exception handling. Done --> 5/14
 5. Logger unification. Done --> 5/14
 6. Injections code. Done --> 5/14
+7. BouncyCastle AES encryption for passwords. Done --> 5/21
 
 **TODOs**
 
-1. Custom exceptions/Custom pages.
-2. BouncyCastle AES encryption for passwords.
-3. Correct dangerous casts to Object.
+1. Custom exceptions/Custom pages. ** PRIO: min **
+2. Correct dangerous casts to Object. ** PRIO: min **
+3. Main page HTML/CSS design for welcome page. ** PRIO: high **
 
 :boom::boom::boom::boom::boom::boom::boom:
 

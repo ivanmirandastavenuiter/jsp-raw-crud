@@ -12,6 +12,15 @@
 <%@ page import="java.util.Set" %>
 <%@ page import="java.util.regex.Pattern" %>
 <%@ page import="java.util.regex.Matcher" %>
+<%@ page import="java.security.Key" %>
+<%@ page import="java.security.SecureRandom" %>
+<%@ page import="java.security.Security" %>
+<%@ page import="javax.crypto.Cipher" %>
+<%@ page import="javax.crypto.KeyGenerator" %>
+<%@ page import="javax.crypto.spec.IvParameterSpec" %>
+<%@ page import="javax.crypto.spec.SecretKeySpec" %>
+<%@ page import="org.bouncycastle.jce.provider.BouncyCastleProvider" %>
+<%@ page import="org.bouncycastle.util.encoders.Hex" %>
 <%@ taglib uri = "http://java.sun.com/jsp/jstl/core" prefix = "c" %>
 <!DOCTYPE html>
 <html>
@@ -222,122 +231,133 @@
 				request.setAttribute("userInput", userInput);
 			} else {
 				if (request.getAttribute("userInput") instanceof HashMap) {
-					userInput = (HashMap<String, String>)request.getAttribute("userInput");
+					userInput = (HashMap<String, String>)request.getAttribute("userInput"); // Corregir el warning del cast
 				}
 			}
 			
 			Pattern pattern;
 			Matcher matcher;
 			
-			if (name == null || name.isEmpty()) {
-				logger.warning("Bad input for name. Populating cookie");
-				nameCookieError = new Cookie("name", "name");
-				nameCookieError.setMaxAge(1);
-				response.addCookie(nameCookieError);
-				validation = false;
-			}
-			
-			if (surname == null || surname.isEmpty()) {
-				logger.warning("Bad input for surname. Populating cookie");
-				surnameCookieError = new Cookie("surname", "surname");
-				surnameCookieError.setMaxAge(1);
-				response.addCookie(surnameCookieError);
-				validation = false;
-			}
-			
-			if (username == null || username.isEmpty()) {
-				logger.warning("Bad input for username. Populating cookie");
-				usernameCookieError = new Cookie("username", "username");
-				usernameCookieError.setMaxAge(1);
-				response.addCookie(usernameCookieError);
-				validation = false;
-			}
-			
-			String phoneRegex = "(^(\\+\\s?([0]{2})\\s?([0-9]{2})\\s?)?([6-7]{1}[0-9]{2}){1}(\\s([0-9]{3}\\s?[0-9]{3}|[0-9]{2}\\s?[0-9]{2}\\s?[0-9]{2})|([0-9]){6})$)";
+			// First validations block
+			try {
+				
+				if (name == null || name.isEmpty()) {
+					logger.warning("Bad input for name. Populating cookie");
+					nameCookieError = new Cookie("name", "name");
+					nameCookieError.setMaxAge(1);
+					response.addCookie(nameCookieError);
+					validation = false;
+				}
+				
+				if (surname == null || surname.isEmpty()) {
+					logger.warning("Bad input for surname. Populating cookie");
+					surnameCookieError = new Cookie("surname", "surname");
+					surnameCookieError.setMaxAge(1);
+					response.addCookie(surnameCookieError);
+					validation = false;
+				}
+				
+				if (username == null || username.isEmpty()) {
+					logger.warning("Bad input for username. Populating cookie");
+					usernameCookieError = new Cookie("username", "username");
+					usernameCookieError.setMaxAge(1);
+					response.addCookie(usernameCookieError);
+					validation = false;
+				}
+				
+				String phoneRegex = "(^(\\+\\s?([0]{2})\\s?([0-9]{2})\\s?)?([6-7]{1}[0-9]{2}){1}(\\s([0-9]{3}\\s?[0-9]{3}|[0-9]{2}\\s?[0-9]{2}\\s?[0-9]{2})|([0-9]){6})$)";
 
-			if (phone == null || phone.isEmpty()) {
-				logger.warning("Bad input for phone. Populating cookie");
-				phoneCookieError = new Cookie("phone", "empty");
-				phoneCookieError.setMaxAge(1);
-				response.addCookie(phoneCookieError);
-				validation = false;
-			} else {
-				
-				pattern = Pattern.compile(phoneRegex);
-				matcher = pattern.matcher(phone);
-				
-				if (!matcher.matches()) {
-					logger.warning("Bad input for phone. Expression not passed.");
-					phoneCookieError = new Cookie("phone", "regex-fail");
+				if (phone == null || phone.isEmpty()) {
+					logger.warning("Bad input for phone. Populating cookie");
+					phoneCookieError = new Cookie("phone", "empty");
 					phoneCookieError.setMaxAge(1);
 					response.addCookie(phoneCookieError);
 					validation = false;
+				} else {
+					
+					pattern = Pattern.compile(phoneRegex);
+					matcher = pattern.matcher(phone);
+					
+					if (!matcher.matches()) {
+						logger.warning("Bad input for phone. Expression not passed.");
+						phoneCookieError = new Cookie("phone", "regex-fail");
+						phoneCookieError.setMaxAge(1);
+						response.addCookie(phoneCookieError);
+						validation = false;
+					}
 				}
-			}
-			
-			String emailRegex = "^[\\w\\d\\\\\\^\\$\\.\\|\\?\\*\\+\\(\\)\\[\\{\\}\\]\\/\\-!'Â·%&=Â¿`Â´Ã‡Ã§_.;:,]+@[\\w\\d\\.\\-]+\\.[a-z]{2,3}$";
-			
-			if (email == null || email.isEmpty()) {
-				logger.warning("Bad input for email. Populating cookie");
-				emailCookieError = new Cookie("email", "empty");
-				emailCookieError.setMaxAge(1);
-				response.addCookie(emailCookieError);
-				validation = false;
-			} else {
 				
-				pattern = Pattern.compile(emailRegex);
-				matcher = pattern.matcher(email);
+				String emailRegex = "^[\\w\\d\\\\\\^\\$\\.\\|\\?\\*\\+\\(\\)\\[\\{\\}\\]\\/\\-!'Â·%&=Â¿`Â´Ã‡Ã§_.;:,]+@[\\w\\d\\.\\-]+\\.[a-z]{2,3}$";
 				
-				if (!matcher.matches()) {
-					logger.warning("Bad input for email. Expression not passed.");
-					emailCookieError = new Cookie("email", "regex-fail");
+				if (email == null || email.isEmpty()) {
+					logger.warning("Bad input for email. Populating cookie");
+					emailCookieError = new Cookie("email", "empty");
 					emailCookieError.setMaxAge(1);
 					response.addCookie(emailCookieError);
 					validation = false;
+				} else {
+					
+					pattern = Pattern.compile(emailRegex);
+					matcher = pattern.matcher(email);
+					
+					if (!matcher.matches()) {
+						logger.warning("Bad input for email. Expression not passed.");
+						emailCookieError = new Cookie("email", "regex-fail");
+						emailCookieError.setMaxAge(1);
+						response.addCookie(emailCookieError);
+						validation = false;
+					}
 				}
-			}
-			
-			String passwordRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\\$%\\^&\\*])(?=\\S+$)(.{8,})";
-			
-			if (password == null || password.isEmpty()) {
-				logger.warning("Bad input for password. Populating cookie");
-				passwordCookieError = new Cookie("password", "empty");
-				passwordCookieError.setMaxAge(1);
-				response.addCookie(passwordCookieError);
-				validation = false;
-			} else {
 				
-				pattern = Pattern.compile(passwordRegex);
-				matcher = pattern.matcher(password);
+				String passwordRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\\$%\\^&\\*])(?=\\S+$)(.{8,})";
 				
-				if (!matcher.matches()) {
-					logger.warning("Bad input for password. Expression not passed.");
-					passwordCookieError = new Cookie("password", "regex-fail");
+				if (password == null || password.isEmpty()) {
+					logger.warning("Bad input for password. Populating cookie");
+					passwordCookieError = new Cookie("password", "empty");
 					passwordCookieError.setMaxAge(1);
 					response.addCookie(passwordCookieError);
 					validation = false;
+				} else {
+					
+					pattern = Pattern.compile(passwordRegex);
+					matcher = pattern.matcher(password);
+					
+					if (!matcher.matches()) {
+						logger.warning("Bad input for password. Expression not passed.");
+						passwordCookieError = new Cookie("password", "regex-fail");
+						passwordCookieError.setMaxAge(1);
+						response.addCookie(passwordCookieError);
+						validation = false;
+					}
 				}
-			}
-			
-			if (confirm == null || confirm.isEmpty()) {
-				logger.warning("Bad input for confirm. Populating cookie");
-				confirmCookieError = new Cookie("confirm", "confirm");
-				confirmCookieError.setMaxAge(1);
-				response.addCookie(confirmCookieError);
-				validation = false;
-			}
-			
-			if (password != null && !password.isEmpty()) {
-				pattern = Pattern.compile(passwordRegex);
-				matcher = pattern.matcher(password);
 				
-				if (!password.equals(confirm) && matcher.matches()) {
-					logger.warning("Password does not match confirmation field.");
-					passwordsNotEqualError = new Cookie("password", "not-equal");
-					passwordsNotEqualError.setMaxAge(1);
-					response.addCookie(passwordsNotEqualError);
+				if (confirm == null || confirm.isEmpty()) {
+					logger.warning("Bad input for confirm. Populating cookie");
+					confirmCookieError = new Cookie("confirm", "confirm");
+					confirmCookieError.setMaxAge(1);
+					response.addCookie(confirmCookieError);
 					validation = false;
 				}
+				
+				if (password != null && !password.isEmpty()) {
+					pattern = Pattern.compile(passwordRegex);
+					matcher = pattern.matcher(password);
+					
+					if (!password.equals(confirm) && matcher.matches()) {
+						logger.warning("Password does not match confirmation field.");
+						passwordsNotEqualError = new Cookie("password", "not-equal");
+						passwordsNotEqualError.setMaxAge(1);
+						response.addCookie(passwordsNotEqualError);
+						validation = false;
+					}
+				}
+				
+			} catch (Exception e) {
+				
+				logger.severe("Exception thrown while checking initial validation");
+				logger.severe("Cause of the exception: " + e.getCause());
+				logger.severe("Information for the exception: " + e.getMessage());
+				
 			}
 			
 			// Unique usernames, emails and phones
@@ -350,6 +370,7 @@
 			PreparedStatement phoneStmt = null;
 			ResultSet rs = null;
 			
+			// JS Injection validation block
 			if (validation) {
 				
 				String injectionRegex = "((<[^>]*(>|$))|(&lt;?(?!&gt;?)(.*(&gt;?){1}|.*$))|(&#0*60(?!&#0*62)(.*(&#0*62){1}|.*$))|(&#x0*3c(?!&#x0*3e)(.*(&#x0*3e){1}|.*$)))";
@@ -359,77 +380,69 @@
 				
 				pattern = Pattern.compile(injectionRegex);
 				
-				// Validation for potential JS injections
-				for (String userInputKey : userInput.keySet()) {
+				try {
 					
-					logger.info("Sanitizing values for preventing JS injections. Current key is: " + userInputKey);
-					logger.info("Value for key is: " + userInput.get(userInputKey));
-					
-					userInputValue = userInput.get(userInputKey);
-					matcher = pattern.matcher(userInputValue);
-					
-					if (matcher.find()) {
+					// Validation for potential JS injections
+					for (String userInputKey : userInput.keySet()) {
 						
-						logger.info("Injection pattern matched. Looking for exact match");
+						logger.info("Sanitizing values for preventing JS injections. Current key is: " + userInputKey);
 						
-						for (String currentTag : dangerousTags) {
+						userInputValue = userInput.get(userInputKey);
+						matcher = pattern.matcher(userInputValue);
+						
+						if (matcher.find()) {
 							
-							if (currentTag.length() >= 2) {
-								logger.info("CURRENT TAG IS: " + currentTag);
-								logger.info("CURRENT TAG GREATER THAN 2: " + (currentTag.length() >= 2));
-								logger.info("CURRENT TAG SUBSTRING 0 TO 2 IS &#: " + (currentTag.substring(0, 2) == "&#"));
-								logger.info("CURRENT USER VALUE CONTAINS THIS TAG :" + (userInputValue.indexOf(currentTag.substring(0, 2)) > -1));
-							}
+							logger.warning("Injection pattern matched. Looking for exact match.");
 							
-							
-							userInputValue = userInput.get(userInputKey);
-							
-							if (userInputValue.indexOf(currentTag) > -1) {
+							for (String currentTag : dangerousTags) {
 								
-								if (currentTag.equals("&#60") || currentTag.equals("&#62")) {
-									
-									logger.info("INJECTION DETECTED. CLEANING. TYPE: &#60");
-									
-									regex = "&#0*6(0|2)";
-									userInput.put(userInputKey, userInputValue.replaceAll(regex, ""));
-									
-								} else if (currentTag.equals("&#x3c") || currentTag.equals("&#x3e")) {
-									
-									logger.info("INJECTION DETECTED. CLEANING. TYPE: &#x3c");
-									
-									regex = "&#x0*3(c|e)";
-									userInput.put(userInputKey, userInputValue.replaceAll(regex, ""));
-									
-								} else {
-									
-									logger.info("INJECTION DETECTED. CLEANING. TYPE: NORMAL");
-									
-									userInput.put(userInputKey, userInputValue.replaceAll(currentTag, ""));
-									logger.info("Now input is :" + userInput.get(userInputKey));
-									
-								}
+								userInputValue = userInput.get(userInputKey);
 								
-							} else if (currentTag.length() >= 2 && 
-									   currentTag.substring(0, 2).equals("&#") && 
-									   userInputValue.indexOf(currentTag.substring(0, 2)) > -1) {
-								
-								logger.info("Inside if. Detecting OVERFLOW");
-								
-								if (userInputValue.indexOf("60") > -1 || userInputValue.indexOf("62") > -1) {
-									if ((userInputValue.indexOf("6") - userInputValue.indexOf("#")) > 1) {
+								if (userInputValue.indexOf(currentTag) > -1) {
+									
+									if (currentTag.equals("&#60") || currentTag.equals("&#62")) {
 										
-										logger.info("INJECTION DETECTED. CLEANING. TYPE: OVERFLOW ON &#60");
+										logger.warning("Injection detected. Cleaning. Type: &#60");
+										
 										regex = "&#0*6(0|2)";
 										userInput.put(userInputKey, userInputValue.replaceAll(regex, ""));
-									}
-								}
-								
-								if (userInputValue.indexOf("3c") > -1 || userInputValue.indexOf("3e") > -1) {
-									if ((userInputValue.indexOf("3") - userInputValue.indexOf("x")) > 1) {
-										logger.info("INJECTION DETECTED. CLEANING. TYPE: OVERFLOW ON &#x3c");
+										
+									} else if (currentTag.equals("&#x3c") || currentTag.equals("&#x3e")) {
+										
+										logger.warning("Injection detected. Cleaning. Type: &#x3c");
+										
 										regex = "&#x0*3(c|e)";
 										userInput.put(userInputKey, userInputValue.replaceAll(regex, ""));
+										
+									} else {
+										
+										logger.info("Injection detected. Cleaning. Type: normal");
+										userInput.put(userInputKey, userInputValue.replaceAll(currentTag, ""));
+										
 									}
+									
+								} else if (currentTag.length() >= 2 && 
+										   currentTag.substring(0, 2).equals("&#") && 
+										   userInputValue.indexOf(currentTag.substring(0, 2)) > -1) {
+									
+									logger.warning("Overflow detected");
+									
+									if (userInputValue.indexOf("60") > -1 || userInputValue.indexOf("62") > -1) {
+										if ((userInputValue.indexOf("6") - userInputValue.indexOf("#")) > 1) {
+											logger.warning("Injection detected. Cleaning. Type: overflow on &#60");
+											regex = "&#0*6(0|2)";
+											userInput.put(userInputKey, userInputValue.replaceAll(regex, ""));
+										}
+									}
+									
+									if (userInputValue.indexOf("3c") > -1 || userInputValue.indexOf("3e") > -1) {
+										if ((userInputValue.indexOf("3") - userInputValue.indexOf("x")) > 1) {
+											logger.info("Injection detected. Cleaning. Type: overflow on &#x3c");
+											regex = "&#x0*3(c|e)";
+											userInput.put(userInputKey, userInputValue.replaceAll(regex, ""));
+										}
+									}
+									
 								}
 								
 							}
@@ -438,9 +451,18 @@
 						
 					}
 					
+				} catch (Exception e) {
+					
+					logger.severe("Exception thrown on injection controls block.");
+					logger.severe("Cause of the exception: " + e.getCause());
+					logger.severe("Information for the exception: " + e.getMessage());
+					
 				}
 				
+				// Repeated values validation block
 				try {
+					
+					logger.info("Starting validation for possible repeated values");
 					
 					DriverManager.getDrivers(); 
 					
@@ -483,7 +505,9 @@
 					
 				} catch(Exception e) {
 					
-					logger.severe("Main exception checking unique values: " + e.getMessage());
+					logger.severe("Exception thrown on repeated values controls block.");
+					logger.severe("Cause of the exception: " + e.getCause());
+					logger.severe("Information for the exception: " + e.getMessage());
 					
 				} finally {
 					
@@ -503,7 +527,9 @@
 						
 					} catch(Exception e) {
 						
-						logger.severe("Nested exception checking unique values: " + e.getMessage());
+						logger.severe("Exception thrown when closing resources for repeated values checks.");
+						logger.severe("Cause of the exception: " + e.getCause());
+						logger.severe("Information for the exception: " + e.getMessage());
 						
 					}
 					
@@ -511,15 +537,74 @@
 				
 			}
 			
+			
+			// SQL Statement performing
 			if (validation) {
+				
 				logger.info("Validation passed. Performing user registration.");
 				
-				//Connection conn = null;	
 				PreparedStatement stmt = null;
 				int result;
 				String message = "";
 				
 				try {
+					
+					String hexKeyBytes = "";
+					String hexIvBytes = "";
+					
+					// Encryption process
+					try {
+						
+						Security.addProvider(new BouncyCastleProvider());
+						
+						// Translation to hex
+						byte[] passwordBytes = password.getBytes();
+						StringBuilder sb = new StringBuilder();
+					    for (byte b : passwordBytes) {
+					        sb.append(String.format("%02X ", b));
+					    }
+					    
+					    logger.info("Bytes from original password to hexadecimal: " + sb.toString());
+					    
+					    Key                     key;
+				        Cipher                  inCipher;
+				        
+				        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES", "BC");
+				        keyGenerator.init(256);
+				        key = keyGenerator.generateKey();
+				        
+				        // Key to hex
+				        byte[] keyBytes = Hex.encode(key.getEncoded());
+        				hexKeyBytes = new String(keyBytes); 
+        				
+        				logger.info("Encrypted key value in hexadecimal: " + hexKeyBytes);
+        				
+        				inCipher = Cipher.getInstance("AES/GCM/NoPadding", "BC");
+        		        
+        		        // IV generation
+        		        SecureRandom randomSecureRandom = new SecureRandom();
+        		        byte[] iv = new byte[inCipher.getBlockSize()];
+        		        randomSecureRandom.nextBytes(iv);
+        		        
+        		        hexIvBytes = new String(Hex.encode(iv));
+        		        
+        		        logger.info("Encrypted IV vector in hexadecimal: " + hexIvBytes);
+        		        
+        		        // Encryption initalization
+        		        inCipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(iv));
+        		        
+        		        byte[] enc = inCipher.doFinal(Hex.decode(sb.toString()));
+        		        userInput.put("password", new String(Hex.encode(enc)));
+        		        
+        		        logger.info("Encrypted password value in hexadecimal: " + new String(Hex.encode(enc)));
+						
+					} catch (Exception e) {
+						
+						logger.severe("Exception thrown on encryption process.");
+						logger.severe("Cause of the exception: " + e.getCause());
+						logger.severe("Information for the exception: " + e.getMessage());
+						
+					}
 					
 					String defaultRole = "user";
 					String sql = "INSERT INTO user(usNam, usSur, usUse, usEma, usPho, usPas, usRol) VALUES(?, ?, ?, ?, ?, ?, ?)";
@@ -530,15 +615,63 @@
 					stmt.setString(4, userInput.get("email"));
 					stmt.setString(5, userInput.get("phone"));
 					stmt.setString(6, userInput.get("password"));
-					stmt.setString(7, userInput.get("confirm"));
+					stmt.setString(7, defaultRole);
 					
 					result = stmt.executeUpdate();
 
 					if (result > 0) {
-						message = "User successfully registered into database";
-						logger.info(message);
-						request.getSession().setAttribute("message", message);
-						response.sendRedirect(request.getContextPath());
+						
+						String usId = "";
+						
+						try {
+							
+							// Id retrieval
+							sql = "SELECT usId FROM user WHERE usUse = ? AND usPas = ?";
+							conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ch33tz", "root", "");
+							stmt = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+							stmt.setString(1, userInput.get("username"));
+							stmt.setString(2, userInput.get("password"));
+							rs = stmt.executeQuery();
+							
+							if (rs.first()) {
+								usId = Integer.toString(rs.getInt("usId"));
+							} else {
+								message = "Something went wrong while retreiving user id on encrypted data storage."
+										+ " Check connection or admin for more details.";
+								logger.warning(message);
+								request.getSession().setAttribute("message", message);
+								response.sendRedirect(request.getContextPath());
+							}
+							
+							// Keys storage
+							sql = "INSERT INTO cipher(ciKey, ciVec, usId) VALUES (?, ?, ?)";
+							stmt = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+							stmt.setString(1, hexKeyBytes);
+							stmt.setString(2, hexIvBytes);
+							stmt.setString(3, usId);
+							
+							result = stmt.executeUpdate();
+							
+							if (result > 0) {
+								message = "User successfully registered into database";
+								logger.info(message);
+								request.getSession().setAttribute("message", message);
+								response.sendRedirect(request.getContextPath());
+							} else {
+								message = "Something went wrong while inserting encrypted data. Check connection or admin for more details.";
+								logger.warning(message);
+								request.getSession().setAttribute("message", message);
+								response.sendRedirect(request.getContextPath());
+							}
+							
+						} catch (Exception e) {
+							
+							logger.severe("Exception thrown on encrypted keys storage.");
+							logger.severe("Cause of the exception: " + e.getCause());
+							logger.severe("Information for the exception: " + e.getMessage());
+							
+						}
+						
 					} else {
 						message = "Something went wrong while inserting on database. Check connection or admin for more details.";
 						logger.warning(message);
@@ -548,8 +681,9 @@
 					
 				} catch (Exception e) {
 					
-					logger.severe("Main exception when performing request: " + e.getMessage());
-					e.printStackTrace();
+					logger.severe("Exception thrown on SQL registration statement.");
+					logger.severe("Cause of the exception: " + e.getCause());
+					logger.severe("Information for the exception: " + e.getMessage());
 					
 				} finally {
 					
@@ -563,9 +697,15 @@
 							conn.close();
 						}
 						
+						if (rs != null) {
+							rs.close();
+						}
+						
 					} catch(Exception e) {
 						
-						logger.severe("Nested exception: " + e.getMessage());
+						logger.severe("Exception thrown when closing resources for registration.");
+						logger.severe("Cause of the exception: " + e.getCause());
+						logger.severe("Information for the exception: " + e.getMessage());
 						
 					}
 					

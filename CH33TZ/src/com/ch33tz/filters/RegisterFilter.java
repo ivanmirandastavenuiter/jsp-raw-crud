@@ -105,129 +105,139 @@ public class RegisterFilter implements Filter {
 			Pattern pattern;
 			Matcher matcher;
 			
-			if (name == null || name.isEmpty()) {
-				logger.warning("Bad input for name. Populating cookie");
-				nameCookieError = new Cookie("name", "name");
-				nameCookieError.setMaxAge(1);
-				httpServletResponse.addCookie(nameCookieError);
-				validation = false;
-			}
-			
-			if (surname == null || surname.isEmpty()) {
-				logger.warning("Bad input for surname. Populating cookie");
-				surnameCookieError = new Cookie("surname", "surname");
-				surnameCookieError.setMaxAge(1);
-				httpServletResponse.addCookie(surnameCookieError);
-				validation = false;
-			}
-			
-			if (username == null || username.isEmpty()) {
-				logger.warning("Bad input for username. Populating cookie");
-				usernameCookieError = new Cookie("username", "username");
-				usernameCookieError.setMaxAge(1);
-				httpServletResponse.addCookie(usernameCookieError);
-				validation = false;
-			}
-			
-			String phoneRegex = "(^(\\+\\s?([0]{2})\\s?([0-9]{2})\\s?)?([6-7]{1}[0-9]{2}){1}(\\s([0-9]{3}\\s?[0-9]{3}|[0-9]{2}\\s?[0-9]{2}\\s?[0-9]{2})|([0-9]){6})$)";
+			try {
+				
+				if (name == null || name.isEmpty()) {
+					logger.warning("Bad input for name. Populating cookie");
+					nameCookieError = new Cookie("name", "name");
+					nameCookieError.setMaxAge(1);
+					httpServletResponse.addCookie(nameCookieError);
+					validation = false;
+				}
+				
+				if (surname == null || surname.isEmpty()) {
+					logger.warning("Bad input for surname. Populating cookie");
+					surnameCookieError = new Cookie("surname", "surname");
+					surnameCookieError.setMaxAge(1);
+					httpServletResponse.addCookie(surnameCookieError);
+					validation = false;
+				}
+				
+				if (username == null || username.isEmpty()) {
+					logger.warning("Bad input for username. Populating cookie");
+					usernameCookieError = new Cookie("username", "username");
+					usernameCookieError.setMaxAge(1);
+					httpServletResponse.addCookie(usernameCookieError);
+					validation = false;
+				}
+				
+				String phoneRegex = "(^(\\+\\s?([0]{2})\\s?([0-9]{2})\\s?)?([6-7]{1}[0-9]{2}){1}(\\s([0-9]{3}\\s?[0-9]{3}|[0-9]{2}\\s?[0-9]{2}\\s?[0-9]{2})|([0-9]){6})$)";
 
-			if (phone == null || phone.isEmpty()) {
-				logger.warning("Bad input for phone. Populating cookie");
-				phoneCookieError = new Cookie("phone", "empty");
-				phoneCookieError.setMaxAge(1);
-				httpServletResponse.addCookie(phoneCookieError);
-				validation = false;
-			} else {
-				
-				pattern = Pattern.compile(phoneRegex);
-				matcher = pattern.matcher(phone);
-				
-				if (!matcher.matches()) {
-					logger.warning("Bad input for phone. Expression not passed.");
-					phoneCookieError = new Cookie("phone", "regex-fail");
+				if (phone == null || phone.isEmpty()) {
+					logger.warning("Bad input for phone. Populating cookie");
+					phoneCookieError = new Cookie("phone", "empty");
 					phoneCookieError.setMaxAge(1);
 					httpServletResponse.addCookie(phoneCookieError);
 					validation = false;
+				} else {
+					
+					pattern = Pattern.compile(phoneRegex);
+					matcher = pattern.matcher(phone);
+					
+					if (!matcher.matches()) {
+						logger.warning("Bad input for phone. Expression not passed.");
+						phoneCookieError = new Cookie("phone", "regex-fail");
+						phoneCookieError.setMaxAge(1);
+						httpServletResponse.addCookie(phoneCookieError);
+						validation = false;
+					}
 				}
-			}
-			
-			String emailRegex = "^[\\w\\d\\\\\\^\\$\\.\\|\\?\\*\\+\\(\\)\\[\\{\\}\\]\\/\\-!'·%&=¿`´Çç_.;:,]+@[\\w\\d\\.\\-]+\\.[a-z]{2,3}$";
-			
-			if (email == null || email.isEmpty()) {
-				logger.warning("Bad input for email. Populating cookie");
-				emailCookieError = new Cookie("email", "empty");
-				emailCookieError.setMaxAge(1);
-				httpServletResponse.addCookie(emailCookieError);
-				validation = false;
-			} else {
 				
-				pattern = Pattern.compile(emailRegex);
-				matcher = pattern.matcher(email);
+				String emailRegex = "^[\\w\\d\\\\\\^\\$\\.\\|\\?\\*\\+\\(\\)\\[\\{\\}\\]\\/\\-!'·%&=¿`´Çç_.;:,]+@[\\w\\d\\.\\-]+\\.[a-z]{2,3}$";
 				
-				if (!matcher.matches()) {
-					logger.warning("Bad input for email. Expression not passed.");
-					emailCookieError = new Cookie("email", "regex-fail");
+				if (email == null || email.isEmpty()) {
+					logger.warning("Bad input for email. Populating cookie");
+					emailCookieError = new Cookie("email", "empty");
 					emailCookieError.setMaxAge(1);
 					httpServletResponse.addCookie(emailCookieError);
 					validation = false;
+				} else {
+					
+					pattern = Pattern.compile(emailRegex);
+					matcher = pattern.matcher(email);
+					
+					if (!matcher.matches()) {
+						logger.warning("Bad input for email. Expression not passed.");
+						emailCookieError = new Cookie("email", "regex-fail");
+						emailCookieError.setMaxAge(1);
+						httpServletResponse.addCookie(emailCookieError);
+						validation = false;
+					}
 				}
-			}
-			
-			String passwordRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\\$%\\^&\\*])(?=\\S+$)(.{8,})";
-			
-			if (password == null || password.isEmpty()) {
-				logger.warning("Bad input for password. Populating cookie");
-				passwordCookieError = new Cookie("password", "empty");
-				passwordCookieError.setMaxAge(1);
-				httpServletResponse.addCookie(passwordCookieError);
-				validation = false;
-			} else {
 				
-				pattern = Pattern.compile(passwordRegex);
-				matcher = pattern.matcher(password);
+				String passwordRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\\$%\\^&\\*])(?=\\S+$)(.{8,})";
 				
-				if (!matcher.matches()) {
-					logger.warning("Bad input for password. Expression not passed.");
-					passwordCookieError = new Cookie("password", "regex-fail");
+				if (password == null || password.isEmpty()) {
+					logger.warning("Bad input for password. Populating cookie");
+					passwordCookieError = new Cookie("password", "empty");
 					passwordCookieError.setMaxAge(1);
 					httpServletResponse.addCookie(passwordCookieError);
 					validation = false;
+				} else {
+					
+					pattern = Pattern.compile(passwordRegex);
+					matcher = pattern.matcher(password);
+					
+					if (!matcher.matches()) {
+						logger.warning("Bad input for password. Expression not passed.");
+						passwordCookieError = new Cookie("password", "regex-fail");
+						passwordCookieError.setMaxAge(1);
+						httpServletResponse.addCookie(passwordCookieError);
+						validation = false;
+					}
 				}
-			}
-			
-			if (confirm == null || confirm.isEmpty()) {
-				logger.warning("Bad input for confirm. Populating cookie");
-				confirmCookieError = new Cookie("confirm", "confirm");
-				confirmCookieError.setMaxAge(1);
-				httpServletResponse.addCookie(confirmCookieError);
-				validation = false;
-			}
-			
-			if (password != null && !password.isEmpty()) {
 				
-				pattern = Pattern.compile(passwordRegex);
-				matcher = pattern.matcher(password);
-				
-				if (!password.equals(confirm) && matcher.matches()) {
-					logger.warning("Password does not match confirmation field.");
-					passwordsNotEqualError = new Cookie("password", "not-equal");
-					passwordsNotEqualError.setMaxAge(1);
-					httpServletResponse.addCookie(passwordsNotEqualError);
+				if (confirm == null || confirm.isEmpty()) {
+					logger.warning("Bad input for confirm. Populating cookie");
+					confirmCookieError = new Cookie("confirm", "confirm");
+					confirmCookieError.setMaxAge(1);
+					httpServletResponse.addCookie(confirmCookieError);
 					validation = false;
 				}
 				
-			}
-			
-			if (validation) {
-				logger.info("Validation passed on filtering. Forwarding to target page.");
-				httpServletRequest.setAttribute("errors", false);
-				chain.doFilter(httpServletRequest, httpServletResponse);
-			} else {
-				logger.info("Validation not passed. Returning to register form from filter.");
-				httpServletRequest.setAttribute("errors", true);
-	            RequestDispatcher rd = httpServletRequest.getRequestDispatcher(contextPath);
-	            rd.forward(httpServletRequest, httpServletResponse);
-	            return;
+				if (password != null && !password.isEmpty()) {
+					
+					pattern = Pattern.compile(passwordRegex);
+					matcher = pattern.matcher(password);
+					
+					if (!password.equals(confirm) && matcher.matches()) {
+						logger.warning("Password does not match confirmation field.");
+						passwordsNotEqualError = new Cookie("password", "not-equal");
+						passwordsNotEqualError.setMaxAge(1);
+						httpServletResponse.addCookie(passwordsNotEqualError);
+						validation = false;
+					}
+					
+				}
+				
+				if (validation) {
+					logger.info("Validation passed on filtering. Forwarding to target page.");
+					httpServletRequest.setAttribute("errors", false);
+					chain.doFilter(httpServletRequest, httpServletResponse);
+				} else {
+					logger.info("Validation not passed. Returning to register form from filter.");
+					httpServletRequest.setAttribute("errors", true);
+		            RequestDispatcher rd = httpServletRequest.getRequestDispatcher(contextPath);
+		            rd.forward(httpServletRequest, httpServletResponse);
+		            return;
+				}
+				
+			} catch (Exception e) {
+				
+				logger.severe("Exception detected on register filter");
+				logger.severe("Cause of the exception: " + e.getCause());
+				logger.severe("Information for the exception: " + e.getMessage());
+				
 			}
 			
 		}

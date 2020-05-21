@@ -10,6 +10,15 @@
 <%@ page import="java.util.Collection" %>
 <%@ page import="java.util.Set" %>
 <%@ page import="java.util.Set" %>
+<%@ page import="java.security.Key" %>
+<%@ page import="java.security.SecureRandom" %>
+<%@ page import="java.security.Security" %>
+<%@ page import="javax.crypto.Cipher" %>
+<%@ page import="javax.crypto.KeyGenerator" %>
+<%@ page import="javax.crypto.spec.IvParameterSpec" %>
+<%@ page import="javax.crypto.spec.SecretKeySpec" %>
+<%@ page import="org.bouncycastle.jce.provider.BouncyCastleProvider" %>
+<%@ page import="org.bouncycastle.util.encoders.Hex" %>
 <%@ taglib uri = "http://java.sun.com/jsp/jstl/core" prefix = "c" %>
 <!DOCTYPE html>
 <html>
@@ -224,7 +233,6 @@
 			logger.info("Starting validation on target page.");
 			logger.info("POST request detected on target page. Applying validation against input data.");
 	
-			//Validation of the user input
 			String username = request.getParameter("username");
 			String password = request.getParameter("pass");
 			String contextPath = "/";
@@ -270,7 +278,9 @@
 				
 			} catch (Exception e) {
 				
-				logger.severe("Exception thrown on validation: " + e.getMessage());
+				logger.severe("Exception thrown while performing validation on target page.");
+				logger.severe("Cause of the exception: " + e.getCause());
+				logger.severe("Information for the exception: " + e.getMessage());
 				
 			}
 			
@@ -293,27 +303,90 @@
 					// This sentence is equivalent to: Class.forName("com.mysql.cj.jdbc.Driver")
 					DriverManager.getDrivers(); 
 					
-					String sql = "SELECT * FROM user WHERE usUse = ? AND usPas = ?";
+					String sql = "SELECT * from user U " +
+													"JOIN cipher C " +
+												    "on U.usId = C.usId " +
+												    "WHERE usUse = ?";
 					conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ch33tz", "root", "");
 					stmt = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 					stmt.setString(1, username);
-					stmt.setString(2, password);
 					rs = stmt.executeQuery();
 
 					if (rs.first()) {
 						
-						logger.info("User found: " + rs.getString("usUse") + ". Populating user data.");
+						String hexKeyBytes = "";
+						String hexIvBytes = "";
+						String encryptedPassword = "";
+						int usId = 0;
+						int usIdCipherReference = 0;
+						String decryptedPassword = "";
 						
-						userData.put("id", Integer.toString(rs.getInt("usId")));
-						userData.put("name", rs.getString("usNam"));
-						userData.put("surname", rs.getString("usSur"));
-						userData.put("username", rs.getString("usUse"));
-						userData.put("email", rs.getString("usEma"));
+						// Decryption process
+						try {
+							
+							Security.addProvider(new BouncyCastleProvider());
+							
+							hexKeyBytes = rs.getString("ciKey");
+							hexIvBytes = rs.getString("ciVec");
+							encryptedPassword = rs.getString("usPas");
+							usId = Integer.parseInt(rs.getString("U.usId"));
+							usIdCipherReference = Integer.parseInt(rs.getString("C.usId"));
+							
+							Key                     key;
+					        Cipher                  outCipher;
+					        
+					        outCipher = Cipher.getInstance("AES/GCM/NoPadding", "BC");
+							
+							// Key recovery
+							byte[] keyBytes = Hex.decode(hexKeyBytes);
+							key = new SecretKeySpec(keyBytes, "AES");
+							
+							logger.info("Key loaded");
+							
+							// IV vector recovery
+							byte[] iv = Hex.decode(hexIvBytes);
+							
+							logger.info("Vector loaded");
+							
+							// Decryption initialization
+							outCipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv));
+							
+							byte[] dec = outCipher.doFinal(Hex.decode(encryptedPassword));
+							decryptedPassword = new String(dec);
+							
+							logger.info("Decrypted password value is: " + decryptedPassword);
+	
+							
+						} catch (Exception e) {
+							
+							logger.severe("Exception thrown while performing data decryption. Check connection or contact admin for more details.");
+							logger.severe("Cause of the exception: " + e.getCause());
+							logger.severe("Information for the exception: " + e.getMessage());
+							
+						}
 						
-						logger.info("Redirecting to welcome page...");
-						
-						request.getSession().setAttribute("user", userData);
-						response.sendRedirect(request.getContextPath() + "/JSP/welcome.jsp");
+						if (usId == usIdCipherReference && password.equals(decryptedPassword)) {
+							
+							logger.info("User found: " + rs.getString("usUse") + ". Populating user data.");
+							
+							userData.put("id", Integer.toString(rs.getInt("U.usId")));
+							userData.put("name", rs.getString("usNam"));
+							userData.put("surname", rs.getString("usSur"));
+							userData.put("username", rs.getString("usUse"));
+							userData.put("email", rs.getString("usEma"));
+							
+							logger.info("Redirecting to welcome page...");
+							
+							request.getSession().setAttribute("user", userData);
+							response.sendRedirect(request.getContextPath() + "/JSP/welcome.jsp");
+							
+						} else {
+							logger.warning("User not found. Populating cookie");
+							logger.info("Returning to login form.");
+							Cookie userNotFoundCookie = new Cookie("error", "user-not-found");
+							userNotFoundCookie.setMaxAge(1);
+							response.addCookie(userNotFoundCookie);
+						}
 						
 					} else {
 						logger.warning("User not found. Populating cookie");
@@ -325,7 +398,9 @@
 					
 				} catch (Exception e) {
 					
-					logger.severe("Main exception: " + e.getMessage());
+					logger.severe("Exception thrown while executing SQL statement to check user identity.");
+					logger.severe("Cause of the exception: " + e.getCause());
+					logger.severe("Information for the exception: " + e.getMessage());
 					
 				} finally {
 					
@@ -345,7 +420,9 @@
 						
 					} catch(Exception e) {
 						
-						logger.severe("Nested exception: " + e.getMessage());
+						logger.severe("Exception thrown at finally block on closing resources.");
+						logger.severe("Cause of the exception: " + e.getCause());
+						logger.severe("Information for the exception: " + e.getMessage());
 						
 					}
 					
@@ -426,8 +503,6 @@
 		</div>
 		
 	</div>
-
-	
 	
 </body>
 </html>

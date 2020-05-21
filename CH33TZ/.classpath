@@ -16,5 +16,12 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/mysql-connector-java-8.0.20.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/json-20180813.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/bcmail-jdk14-165.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/bcpg-jdk14-165.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/bcpkix-jdk14-165.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/bcprov-jdk14-165.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/bctest-jdk14-165.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/bctls-jdk14-165.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/commons-codec-1.14.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

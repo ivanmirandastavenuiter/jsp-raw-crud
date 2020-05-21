@@ -276,7 +276,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			
 			submit = true;
 			validation = true;
-			//inputsMap.forEach(cleanPossibleJSInjections);
+			inputsMap.forEach(cleanPossibleJSInjections);
 			inputsMap.forEach(validateInputs);
 			
 			return validation;
@@ -576,7 +576,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			
 		} catch(err) {
 			
-			console.log('Exception thrown by parent try/catch block: ');
+			console.log('Exception thrown while performing controls over server data.');
 			console.log('Name: ' + err.name);
 			console.log('Description: ' + err.message);
 			console.log('Stack: ' + err.stack);

@@ -74,38 +74,48 @@ public class LoginFilter implements Filter {
 			userInput.put("password", password);
 			httpServletRequest.setAttribute("userInput", userInput);
 			
-			if (username == null || username.isEmpty()
-						|| password == null || password.isEmpty()) {
+			try {
 				
-				logger.info("Errors detected on login form. Redirecting to index from filter.");
-				
-				Cookie usernameCookieError = null;
-				Cookie passwordCookieError = null;
-				
-				if (username == null || username.isEmpty()) {
-					logger.warning("Bad input for username. Populating cookie");
-					usernameCookieError = new Cookie("username", "username");
-					usernameCookieError.setMaxAge(1);
-					httpServletResponse.addCookie(usernameCookieError);
-				} 
-				
-				if (password == null || password.isEmpty() ) {
-					logger.warning("Bad input for password. Populating cookie");
-					passwordCookieError = new Cookie("password", "password");
-					passwordCookieError.setMaxAge(1);
-					httpServletResponse.addCookie(passwordCookieError);
+				if (username == null || username.isEmpty()
+							|| password == null || password.isEmpty()) {
+					
+					logger.info("Errors detected on login form. Redirecting to index from filter.");
+					
+					Cookie usernameCookieError = null;
+					Cookie passwordCookieError = null;
+					
+					if (username == null || username.isEmpty()) {
+						logger.warning("Bad input for username. Populating cookie");
+						usernameCookieError = new Cookie("username", "username");
+						usernameCookieError.setMaxAge(1);
+						httpServletResponse.addCookie(usernameCookieError);
+					} 
+					
+					if (password == null || password.isEmpty() ) {
+						logger.warning("Bad input for password. Populating cookie");
+						passwordCookieError = new Cookie("password", "password");
+						passwordCookieError.setMaxAge(1);
+						httpServletResponse.addCookie(passwordCookieError);
+					}
+					
+					httpServletRequest.setAttribute("errors", true);
+		            RequestDispatcher rd = httpServletRequest.getRequestDispatcher(contextPath);
+		            rd.forward(httpServletRequest, httpServletResponse);
+		            return;
+	
 				}
 				
-				httpServletRequest.setAttribute("errors", true);
-	            RequestDispatcher rd = httpServletRequest.getRequestDispatcher(contextPath);
-	            rd.forward(httpServletRequest, httpServletResponse);
-	            return;
-
-			}
+				logger.info("Validation passed on filtering. Forwarding to target page.");
+				httpServletRequest.setAttribute("errors", false);
+				chain.doFilter(httpServletRequest, httpServletResponse);
+				
+			} catch (Exception e) {
 			
-			logger.info("Validation passed on filtering. Forwarding to target page.");
-			httpServletRequest.setAttribute("errors", false);
-			chain.doFilter(httpServletRequest, httpServletResponse);
+				logger.severe("Exception detected on login filter");
+				logger.severe("Cause of the exception: " + e.getCause());
+				logger.severe("Information for the exception: " + e.getMessage());
+				
+			}
 			
 		}
 		
