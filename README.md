@@ -45,9 +45,9 @@ LAST UPDATE :point_right: 5/21
 
 **TODOs**
 
-1. Custom exceptions/Custom pages. ** PRIO: min **
-2. Correct dangerous casts to Object. ** PRIO: min **
-3. Main page HTML/CSS design for welcome page. ** PRIO: high **
+1. Custom exceptions/Custom pages. **PRIO: min**
+2. Correct dangerous casts to Object. **PRIO: min**
+3. Main page HTML/CSS design for welcome page. **PRIO: high**
 
 :boom::boom::boom::boom::boom::boom::boom:
 
