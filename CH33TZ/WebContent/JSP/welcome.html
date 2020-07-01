@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://kit.fontawesome.com/465dd91009.js" crossorigin="anonymous"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=PT+Serif&family=Jost:wght@100&family=Fjalla+One&display=swap" rel="stylesheet">
+
+    <title>Welcome page</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Fjalla One', sans-serif;
+            font-size: 14px;
+        }
+        div.con-lvl-0.main-container {
+            margin: 0 auto;
+            height: 100vh;
+            width: 1903px;
+        }
+        div.dv-lvl-1.upper-block {
+            width: 100%;
+            min-height: 87.5px;
+            height: 250px;
+            display: flex;
+        }
+        div.dv-lvl-1.lower-block {
+            width: 100%;
+            display: flex;
+        }
+        div.dv-lvl-1.left-toolbar {
+            height: 100%;
+            /* display: flex;
+            flex-flow: column wrap; */
+            width: 15%;
+            background: #ad3939;
+            font-family: 'Fjalla One', sans-serif;
+
+            /* -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            -ms-box-sizing: border-box;
+            box-sizing: border-box; */
+
+        }
+        div.dv-lvl-1.main-title {
+            height: 100%;
+            width: 85%;
+            box-shadow: 2px 2px 5px -3px;
+
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            -ms-box-sizing: border-box;
+            box-sizing: border-box;
+            ç
+        }
+        div.dv-lvl-1.main-entries {
+            width: 85%;
+
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            -ms-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+
+        div.con-lvl-2.toolbar-header-container {
+            height: 100%;
+            width: 15%;
+            display: flex;
+            flex-flow: column wrap;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            background: #ad3939;
+            font-family: 'Fjalla One', sans-serif;
+        }
+
+        div.con-lvl-2.toolbar-header-container i {
+            font-size: 4em;
+        }
+        div.con-lvl-2.toolbar-container {
+            width: 15%;
+            font-family: 'Fjalla One', sans-serif;
+            background: #ad3939;
+        }
+
+        div.con-lvl-2.toolbar-items-container {
+            background: #fff;
+        }
+
+        div.dv-lvl-3.toolbar-item {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            color: #7c0505;
+            overflow: hidden;
+            position: relative;
+            transition: transform, box-shadow, color .1s linear;
+            box-shadow: 2px 2px 5px -3px #000;
+            /* border-bottom: 1px solid rgba(0, 0, 0, 0.005);
+            border-top: 1px solid rgba(0, 0, 0, 0.025);
+            border-bottom-color: rgba(0, 0, 0, 0.2);
+            border-top-color: rgba(0, 0, 0, 0.05); */
+
+            /* -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            -ms-box-sizing: border-box;
+            box-sizing: border-box; */
+        }
+
+        div.dv-lvl-3.toolbar-item:hover {
+            box-shadow: 1px 1px 0 0 #540707, 1px 1px 4px 0px #540707, 1px 1px 4px 1px #540707;
+            background: linear-gradient(90deg, #ee9b9b, #fff 46%);
+        }
+
+        div.dv-lvl-3.toolbar-item:hover div.dv-lvl-3.lower-corner-arrow {
+            background: #7c0505;
+            top: 0;
+            right: -19%;
+            transform: rotate(0deg);
+            width: 20%;
+            height: 100%;
+        }
+
+        p.par-lvl-3.toolbar-item-text {
+            width: 25%;
+            text-align: right;
+            padding-right: 15%;
+            font-size: .9em;
+        }
+        i.i-lvl-3.fas.fa-arrow-alt-circle-right {
+            font-size: 1.4em;
+
+        }
+        div.dv-lvl-3.lower-corner-arrow {
+            position: absolute;
+            top: 68%;
+            right: -15%;
+            transform: rotate(-45deg);
+            width: 20%;
+            background: #5f4141;
+            height: 100%;
+            transition: background-color, transform .05s linear;
+        }
+        div.dv-lvl-1.main-title {
+            display: flex;
+        }
+        div.dv-lvl-2.title-header {
+            width: 30%;
+            margin: 3%;
+            padding: 1%;
+        }
+        h1.he-lvl-3.title {
+            margin: 0;
+            padding: 0;
+            font-family: 'Fjalla One', sans-serif;
+            font-size: 3em;
+        }
+        p.par-lvl-3.title-description {
+            margin: 0;
+            padding: 0;
+            font-family: 'Fjalla One', sans-serif;
+            font-size: 1em;
+            color: #7c0505;
+        }
+
+        div.dv-lvl-2.header-content {
+            display: flex;
+            align-items: center;
+            height: 100%;
+            width: 70%;
+            position: relative;
+            overflow: hidden;
+        }
+        div.dv-lvl-3.header-content-layer.ly-1 {
+            height: 500px;
+            width: 500px;
+            background: #856e6e;
+            position: absolute;
+            left: 14%;
+
+            transform: rotate(45deg);
+            z-index: -10;
+
+        }
+        div.dv-lvl-3.header-content-layer.ly-2 {
+            height: 500px;
+            width: 500px;
+            background: #b99999;
+            position: absolute;
+            left: 20%;
+
+            transform: rotate(45deg);
+            z-index: -9;
+
+        }
+
+        div.dv-lvl-3.header-content-layer.ly-3 {
+            height: 500px;
+            width: 500px;
+            background: #d5c1c1;
+
+            position: absolute;
+            left: 26%;
+
+            transform: rotate(45deg);
+            z-index: -8;
+
+        }
+
+        div.dv-lvl-3.header-content-layer.ly-4 {
+            height: 100%;
+            width: 68%;
+            background: #d5c1c1;
+
+            position: absolute;
+            right: 0%;
+            z-index: -7;
+
+        }
+        div.con-lvl-4.logout-box {
+            height: 50px;
+            background: #d5c1c1;
+            position: relative;
+            display: flex;
+            justify-content: flex-end;
+            margin: 2% 10%;
+        }
+        div.con-lvl-4.logout-box-menu {
+            height: 50px;
+            background: #d5c1c1;
+            position: relative;
+            display: flex;
+            justify-content: flex-end;
+            margin: 2% 10%;
+            z-index: -6;
+        }
+        div.con-lvl-5.logout-menu-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 15%;
+            position: relative;
+            top: 35px;
+        }
+            div.dv-lvl-5.greeting-message {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 15%;
+                margin-right: 1%;
+            }
+            div.dv-lvl-5.logout-message {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 15%;
+                box-shadow: 0px 0px 1px 0px;
+            }
+        div.dv-lvl-4.hidden-logout-panel {
+            padding: 1.7%;
+            width: 180px;
+            background: #706f6f;
+            border-radius: 10px;
+            box-shadow: 0px 0px 5px 0px;
+        }
+        div.dv-lvl-5.shadow-bundle {
+            margin: 0 auto;
+            width: 85%;
+            overflow: hidden;
+            position: relative;
+            z-index: 4;
+        }
+        div.dv-lvl-5.logout-options {
+            box-shadow: 0px 0px 2px 0px #000000, 0px 0px 2px 0px inset #d4d4d4, 0px 0px 2px 0px #000000, 0px 0px 2px 0px inset #d4d4d4;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding-right: 20px;
+            height: 30px;
+            color: #d4d4d4;
+            font-size: .7em;
+            z-index: 5;
+            position: relative;
+        }
+        div.dv-lvl-4.arrow-hidden-bundle {
+            padding: 0 1.7%;
+            width: 180px;
+            position: relative;
+        }
+        div.dv-lvl-5.arrow-hidden {
+            width: 40px;
+            height: 40px;
+            background: #706f6f;
+            transform: rotate(45deg);
+            box-shadow: 0px 0px 5px 0px;
+            z-index: -1;
+            position: absolute;
+            left: 70.1px;
+            bottom: 53px;
+        }
+        div.dv-lvl-5.arrow-hidden-overlap {
+            width: 40px;
+            height: 40px;
+            background: #706f6f;
+            transform: rotate(45deg);
+            position: absolute;
+            left: 70.1px;
+            bottom: 53px;
+        }
+
+        div.test {
+            background: lightgreen;
+            width: 1000px;
+            height: 700px;
+            margin: 10px auto;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!--
+
+        Naming conventions for elements
+
+            div -> dv
+            paragraphs -> par
+            span -> sp
+            headers -> he
+            anchor tags -> at
+            table -> tbl
+            tr -> tr
+            td -> td
+            theads -> th
+            input -> in
+            form -> frm
+            i -> i
+            image -> img
+
+        Hierarchy
+
+            For levels -> lvl
+            For nesting graduation in levels -> -0, -1... (lvl-0, lvl-1)
+
+        Types
+
+            Containers -> con
+            Items -> it
+
+
+    -->
+
+    <!-- Main container -->
+    <div class="con-lvl-0 main-container">
+
+        <div class="dv-lvl-1 upper-block">
+
+            <div class="con-lvl-2 toolbar-header-container">
+                <i class="i-lvl-3 fas fa-cookie-bite"></i>
+                <p class="par-lvl-3">[Want to]</p>
+            </div>
+
+            <div class="dv-lvl-1 main-title">
+
+                <div class="dv-lvl-2 title-header">
+                    <h1 class="he-lvl-3 title">CH33TZ</h1>
+                    <p class="par-lvl-3 title-description">Whatever you have in mind is welcome</p>
+                </div>
+    
+                <div class="dv-lvl-2 header-content">
+                    <div class="dv-lvl-3 header-content-layer ly-1"></div>
+                    <div class="dv-lvl-3 header-content-layer ly-2"></div>
+                    <div class="dv-lvl-3 header-content-layer ly-3"></div>
+                    <div class="dv-lvl-3 header-content-layer ly-4">
+                        <div class="con-lvl-4 logout-box">
+                            <div class="dv-lvl-5 greeting-message"><span style="font-weight: bold;">Hi&nbsp;</span>Iván</div>
+                            <div class="dv-lvl-5 logout-message"><i class="fas fa-lock"></i></div>
+                        </div>
+                        <div class="con-lvl-4 logout-box-menu">
+                            <div class="con-lvl-5 logout-menu-container">
+    
+                                <div class="dv-lvl-4 hidden-logout-panel">
+                                    <div class="dv-lvl-5 shadow-bundle">
+                                        <div class="dv-lvl-5 logout-options">Action 1</div>
+                                        <div class="dv-lvl-5 logout-options">Action 2</div>
+                                        <div class="dv-lvl-5 logout-options">Action 3</div>
+        
+                                    </div>
+        
+                                    <div class="dv-lvl-4 arrow-hidden-bundle">
+                                        <div class="dv-lvl-5 arrow-hidden-overlap"></div>
+                                        <div class="dv-lvl-5 arrow-hidden"></div>
+                                    </div>
+                                </div>
+    
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+            </div>    
+
+        </div>
+
+        <div class="dv-lvl-1 lower-block">
+
+            <div class="con-lvl-2 toolbar-container">
+
+                <div class="con-lvl-2 toolbar-items-container">
+
+                    <div class="spacer"></div>
+
+                    <div class="dv-lvl-3 toolbar-item">
+                        <i class="i-lvl-3 fas fa-arrow-alt-circle-right"></i>
+                        <p class="par-lvl-3 toolbar-item-text">Action 1</p>
+                        <div class="dv-lvl-3 lower-corner-arrow"></div>
+                    </div>
+                    <div class="dv-lvl-3 toolbar-item">
+                        <i class="i-lvl-3 fas fa-arrow-alt-circle-right"></i>
+                        <p class="par-lvl-3 toolbar-item-text">Action 2</p>
+                        <div class="dv-lvl-3 lower-corner-arrow"></div>
+                    </div>
+                    <div class="dv-lvl-3 toolbar-item">
+                        <i class="i-lvl-3 fas fa-arrow-alt-circle-right"></i>
+                        <p class="par-lvl-3 toolbar-item-text">Action 3</p>
+                        <div class="dv-lvl-3 lower-corner-arrow"></div>
+                    </div>
+                    <div class="dv-lvl-3 toolbar-item">
+                        <i class="i-lvl-3 fas fa-arrow-alt-circle-right"></i>
+                        <p class="par-lvl-3 toolbar-item-text">Action 4</p>
+                        <div class="dv-lvl-3 lower-corner-arrow"></div>
+                    </div>
+
+                    <div class="spacer"></div>
+
+                </div>
+
+            </div>
+
+            <div class="dv-lvl-1 main-entries">
+
+                <div class="test"></div>
+    
+    
+            </div>
+
+        </div>
+
+        <!-- <div class="dv-lvl-1 left-toolbar">
+
+            <div class="con-lvl-2 toolbar-header-container">
+                <i class="i-lvl-3 fas fa-cookie-bite"></i>
+                <p class="par-lvl-3">[Want to]</p>
+            </div>
+
+            <div class="con-lvl-2 toolbar-items-container">
+
+                <div class="spacer"></div>
+
+                <div class="dv-lvl-3 toolbar-item">
+                    <i class="i-lvl-3 fas fa-arrow-alt-circle-right"></i>
+                    <p class="par-lvl-3 toolbar-item-text">Action 1</p>
+                    <div class="dv-lvl-3 lower-corner-arrow"></div>
+                </div>
+                <div class="dv-lvl-3 toolbar-item">
+                    <i class="i-lvl-3 fas fa-arrow-alt-circle-right"></i>
+                    <p class="par-lvl-3 toolbar-item-text">Action 2</p>
+                    <div class="dv-lvl-3 lower-corner-arrow"></div>
+                </div>
+                <div class="dv-lvl-3 toolbar-item">
+                    <i class="i-lvl-3 fas fa-arrow-alt-circle-right"></i>
+                    <p class="par-lvl-3 toolbar-item-text">Action 3</p>
+                    <div class="dv-lvl-3 lower-corner-arrow"></div>
+                </div>
+                <div class="dv-lvl-3 toolbar-item">
+                    <i class="i-lvl-3 fas fa-arrow-alt-circle-right"></i>
+                    <p class="par-lvl-3 toolbar-item-text">Action 4</p>
+                    <div class="dv-lvl-3 lower-corner-arrow"></div>
+                </div>
+
+                <div class="spacer"></div>
+
+
+            </div>
+
+        </div>
+
+        <div class="dv-lvl-1 main-title">
+
+            <div class="dv-lvl-2 title-header">
+                <h1 class="he-lvl-3 title">CH33TZ</h1>
+                <p class="par-lvl-3 title-description">Whatever you have in mind is welcome</p>
+            </div>
+
+            <div class="dv-lvl-2 header-content">
+                <div class="dv-lvl-3 header-content-layer ly-1"></div>
+                <div class="dv-lvl-3 header-content-layer ly-2"></div>
+                <div class="dv-lvl-3 header-content-layer ly-3"></div>
+                <div class="dv-lvl-3 header-content-layer ly-4">
+                    <div class="con-lvl-4 logout-box">
+                        <div class="dv-lvl-5 greeting-message"><span style="font-weight: bold;">Hi&nbsp;</span>Iván</div>
+                        <div class="dv-lvl-5 logout-message"><i class="fas fa-lock"></i></div>
+                    </div>
+                    <div class="con-lvl-4 logout-box-menu">
+                        <div class="con-lvl-5 logout-menu-container">
+
+                            <div class="dv-lvl-4 hidden-logout-panel">
+                                <div class="dv-lvl-5 shadow-bundle">
+                                    <div class="dv-lvl-5 logout-options">Action 1</div>
+                                    <div class="dv-lvl-5 logout-options">Action 2</div>
+                                    <div class="dv-lvl-5 logout-options">Action 3</div>
+    
+                                </div>
+    
+                                <div class="dv-lvl-4 arrow-hidden-bundle">
+                                    <div class="dv-lvl-5 arrow-hidden-overlap"></div>
+                                    <div class="dv-lvl-5 arrow-hidden"></div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="dv-lvl-1 main-entries">
+
+            <div class="test"></div>
+
+
+        </div> -->
+
+    </div>
+        
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function(e) {
+
+            // Main container
+            let mainContainer = document.querySelector("div.con-lvl-0.main-container");
+
+            // Decoration arrows
+            let firstLayer = document.querySelector("div.dv-lvl-3.header-content-layer.ly-1");
+            let secondLayer = document.querySelector("div.dv-lvl-3.header-content-layer.ly-2");
+            let thirdLayer = document.querySelector("div.dv-lvl-3.header-content-layer.ly-3");
+
+            // Context menu
+            let leftToolbar = document.querySelector("div.dv-lvl-1.left-toolbar");
+
+            // Header & Content
+            let header = document.querySelector("div.dv-lvl-1.main-title");
+            let content = document.querySelector("div.dv-lvl-1.main-entries");
+
+            // Upper block
+            let upperBlock = document.querySelector("div.dv-lvl-1.upper-block");
+            
+            // Boolean for restoring normal height on header
+            let normalHeightRestored = true;
+
+            // Check initial values for dimensions
+            checkInitialDimensionsOnZoomChanges();
+
+            window.onresize = function() {
+               
+                checkInitialDimensionsOnZoomChanges();
+
+                console.log('Width: ' + window.innerWidth);
+                console.log('Height: ' + window.innerHeight);
+
+
+
+                // if (this.innerHeight < 750 && this.innerHeight >= 625) {
+                //     // mainContainer.style.width = '1280px';
+                //     // header.style.display = 'none';
+                //     // content.style.display = 'none';
+
+                //     // leftToolbar.style.width = '100%';
+                //     content.style.height = '70%';
+                // } else if (this.innerHeight < 625 && this.innerHeight >= 480) {
+                //     // mainContainer.style.width = '100%';
+                //     content.style.height = '65%';
+                // } else if (this.innerHeight < 480 && this.innerHeight >= 380) {
+                //     // mainContainer.style.width = '100%';
+                //     content.style.height = '60%';
+                // } else if (this.innerHeight < 380 && this.innerHeight >= 320) {
+                //     // mainContainer.style.width = '100%';
+                //     content.style.height = '50%';
+                // } else if (this.innerHeight < 320 && this.innerHeight >= 250) {
+                //     // mainContainer.style.width = '100%';
+                //     content.style.height = '40%';
+                // } else if (this.innerHeight < 250 && this.innerHeight >= 190) {
+                //     // mainContainer.style.width = '100%';
+                //     content.style.height = '20%';
+                // } else if (this.innerHeight < 190) {
+                //     // mainContainer.style.width = '100%';
+                // } else {
+                //     // mainContainer.style.width = '1920px';
+                // }
+
+            }
+
+            // Functions 
+
+            function checkInitialDimensionsOnZoomChanges() {
+
+                if (window.innerWidth > 2200 || window.innerHeight > 1300) {
+                    console.log("Removing rotation");
+                    firstLayer.style.transform = "none";
+                    secondLayer.style.transform = "none";
+                    thirdLayer.style.transform = "none";
+                    firstLayer.style.height = "100%";
+                    secondLayer.style.height = "100%";
+                    thirdLayer.style.height = "100%";
+                } else if (window.innerWidth <= 2200 && window.innerHeight <= 1300) {
+                    console.log("Restoring rotation...");
+                    firstLayer.style.transform = "rotate(45deg)";
+                    secondLayer.style.transform = "rotate(45deg)";
+                    thirdLayer.style.transform = "rotate(45deg)";
+                    firstLayer.style.height = "500px";
+                    secondLayer.style.height = "500px";
+                    thirdLayer.style.height = "500px";
+                } 
+
+            }
+
+        });
+
+
+    </script>
+
+</body>
+</html>
